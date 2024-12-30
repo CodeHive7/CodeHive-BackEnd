@@ -30,8 +30,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
         String accessToken = authService.authenticate(loginRequest);
-        String refreshoken = jwtTokenProvider.generateRefreshToken(loginRequest.getUsername());
-        return ResponseEntity.ok(new TokenResponse(accessToken, refreshoken));
+        String refreshToken = jwtTokenProvider.generateRefreshToken(loginRequest.getUsername());
+        return ResponseEntity.ok(new TokenResponse(accessToken, refreshToken));
     }
 
     @PostMapping("/refresh")

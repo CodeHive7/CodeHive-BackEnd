@@ -4,7 +4,7 @@ databaseChangeLog:
       author: "SimoAcharouaou"
       changes:
         - createTable:
-            tableName: "user"
+            tableName: "users"
             columns:
               - column:
                   name: "id"
@@ -41,3 +41,75 @@ databaseChangeLog:
               - column:
                   name: "phone_number"
                   type: "VARCHAR(20)"
+  - changeSet:
+      id: 2
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "name"
+                  type: "VARCHAR(100)"
+                  constraints:
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 3
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "user_roles"
+            columns:
+              - column:
+                  name: "user_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "role_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "user_roles"
+            baseColumnNames: "user_id"
+            referencedTableName: "users"
+            referencedColumnNames: "id"
+            constraintName: "fk_user_roles_user"
+        - addForeignKeyConstraint:
+            baseTableName: "user_roles"
+            baseColumnNames: "role_id"
+            referencedTableName: "roles"
+            referencedColumnNames: "id"
+            constraintName: "fk_user_roles_role"
+
+  - changeSet:
+      id: 4
+      author: "SimoAcharouaou"
+      changes:
+        - insert:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: "id"
+                  valueNumeric: "1"
+              - column:
+                  name: "name"
+                  value: "ROLE_USER"
+        - insert:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: "id"
+                  valueNumeric: "2"
+              - column:
+                  name: "name"
+                  value: "ROLE_ADMIN"

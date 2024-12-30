@@ -1,13 +1,13 @@
 package com.codehive.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity(name = "users")
 @Getter
 @Setter
 public class User {
@@ -15,10 +15,24 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
+    @Column( name = "email" , nullable = false, unique = true)
     private String email;
+    @Column( name = "password",nullable = false)
     private String password;
+    @Column( name = "location")
     private String location;
+    @Column( name = "phone_number")
     private String phoneNumber;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 }

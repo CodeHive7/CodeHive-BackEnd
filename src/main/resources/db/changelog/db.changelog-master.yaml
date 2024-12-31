@@ -113,3 +113,38 @@ databaseChangeLog:
               - column:
                   name: "name"
                   value: "ROLE_ADMIN"
+  - changeSet:
+      id: 5
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "refresh_tokens"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "token"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: "username"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "expiry_date"
+                  type: "TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "revoked"
+                  type: "BOOLEAN"
+                  constraints:
+                    nullable: false

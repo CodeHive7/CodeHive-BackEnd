@@ -1,5 +1,6 @@
 package com.codehive.controller;
 
+import com.codehive.dto.CreateUserRequest;
 import com.codehive.dto.UserDto;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
@@ -26,8 +27,8 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        UserDto savedUser = adminService.createUser(userDto);
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequest request) {
+        UserDto savedUser = adminService.createUser(request);
         return ResponseEntity.ok(savedUser);
     }
 

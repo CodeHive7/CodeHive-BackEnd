@@ -50,4 +50,10 @@ public class AdminController {
         adminService.assignRolesToUser(userId, roleRequest.getRoleNames());
         return ResponseEntity.ok("Roles assigned successfully");
     }
+
+    @DeleteMapping("/users/{userId}/roles")
+    public ResponseEntity<String> removeRolesFromUser(@PathVariable Long userId, @RequestBody RoleRequest roleRequest) {
+        adminService.removeRolesFromUser(userId, roleRequest.getRoleNames());
+        return ResponseEntity.ok("Roles removed successfully");
+    }
 }

@@ -82,4 +82,17 @@ public class AdminServiceImpl implements AdminService {
         }
         userRepository.save(user);
     }
+
+    @Override
+    public void removeRolesFromUser(Long userId, List<String> roleNames) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not Found"));
+
+        for(String roleName : roleNames){
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new RuntimeException("Role not found"));
+            user.getRoles().remove(role);
+        }
+        userRepository.save(user);
+    }
 }

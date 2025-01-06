@@ -74,6 +74,13 @@ public class AuthServiceImpl implements AuthService {
                         loginRequest.getPassword()
                 )
         );
+
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if(!user.isActive()) {
+            throw new RuntimeException("User is blocked");
+        }
+
         String accessToken = jwtTokenProvider.generateAccessToken(authentication.getName());
         String refreshToken = jwtTokenProvider.generateRefreshToken(authentication.getName());
 

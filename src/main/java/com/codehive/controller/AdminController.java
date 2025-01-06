@@ -1,6 +1,7 @@
 package com.codehive.controller;
 
 import com.codehive.dto.CreateUserRequest;
+import com.codehive.dto.RoleRequest;
 import com.codehive.dto.UserDto;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
@@ -44,5 +45,9 @@ public class AdminController {
         return ResponseEntity.ok("User unblocked successfully");
     }
 
-
+    @PostMapping("/users/{userId}/roles")
+    public ResponseEntity<String> assignRolesToUser(@PathVariable Long userId, @RequestBody RoleRequest roleRequest) {
+        adminService.assignRolesToUser(userId, roleRequest.getRoleNames());
+        return ResponseEntity.ok("Roles assigned successfully");
+    }
 }

@@ -2,15 +2,18 @@ package com.codehive.service.impl;
 
 import com.codehive.dto.CreateUserRequest;
 import com.codehive.dto.UserDto;
+import com.codehive.entity.Permissions;
 import com.codehive.entity.Role;
 import com.codehive.entity.User;
 import com.codehive.mapper.UserMapper;
+import com.codehive.repository.PermissionsRepository;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,12 +21,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PermissionsRepository permissionsRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -92,7 +97,37 @@ public class AdminServiceImpl implements AdminService {
             Role role = roleRepository.findByName(roleName)
                     .orElseThrow(() -> new RuntimeException("Role not found"));
             user.getRoles().remove(role);
+            role.getUsers().remove(user);
         }
         userRepository.save(user);
+    }
+
+    @Override
+    public void assignPermissionsToRole(Long roleId, List<String> permissionNames) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        for (String permName : permissionNames){
+            Permissions permissions = permissionsRepository.findByName(permName)
+                    .orElseThrow(() -> new RuntimeException("Permission not found"));
+
+            role.getPermissions().add(permissions);
+            permissions.getRoles().add(role);
+        }
+        roleRepository.save(role);
+    }
+
+    @Override
+    public void removePermissionsFromRole(Long roleId, List<String> permissionNames) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found: " +roleId));
+
+        for(String permName : permissionNames) {
+            Permissions permission = permissionsRepository.findByName(permName)
+                    .orElseThrow(() -> new RuntimeException("Permission not found: " + permName));
+
+            role.getPermissions().remove(permission);
+            permission.getRoles().remove(role);
+        }
+        roleRepository.save(role);
     }
 }

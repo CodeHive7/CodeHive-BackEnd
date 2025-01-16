@@ -13,4 +13,6 @@ public interface AdminService {
     void unblockUser(Long userId);
     void assignRolesToUser(Long userId, List<String> roleNames);
     void removeRolesFromUser(Long userId, List<String> roleNames);
+    void assignPermissionsToRole(Long roleId, List<String> permissionNames);
+    void removePermissionsFromRole(Long roleId, List<String> permissionNames);
 }

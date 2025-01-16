@@ -28,6 +28,8 @@ public class User {
     private String location;
     @Column( name = "phone_number")
     private String phoneNumber;
+    @Column( name = "is_active" , nullable = false)
+    private boolean isActive = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -35,4 +37,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Project> projects = new HashSet<>();
 }

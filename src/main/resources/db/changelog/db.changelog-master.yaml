@@ -428,3 +428,94 @@ databaseChangeLog:
               - column:
                   name: "name"
                   value: "ACCESS_DASHBOARD"
+  - changeSet:
+      id: 9
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "projects"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "name"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "description"
+                  type: "VARCHAR(1000)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "stage"
+                  type: "VARCHAR(50)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "category"
+                  type: "VARCHAR(50)"
+              - column:
+                  name: "website_url"
+                  type: "VARCHAR(255)"
+              - column:
+                  name: "problem_to_fix"
+                  type: "VARCHAR(1000)"
+              - column:
+                  name: "creator_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "projects"
+            baseColumnNames: "creator_id"
+            referencedTableName: "users"
+            referencedColumnNames: "id"
+            constraintName: "fk_projects_creator"
+  - changeSet:
+      id: 10
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "project_positions"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "role_name"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "paid"
+                  type: "BOOLEAN"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "quantity"
+                  type: "INT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "project_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "project_positions"
+            baseColumnNames: "project_id"
+            referencedTableName: "projects"
+            referencedColumnNames: "id"
+            constraintName: "fk_project_positions_project"
+
+

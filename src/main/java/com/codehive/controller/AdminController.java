@@ -1,6 +1,7 @@
 package com.codehive.controller;
 
 import com.codehive.dto.CreateUserRequest;
+import com.codehive.dto.PermissionRequest;
 import com.codehive.dto.RoleRequest;
 import com.codehive.dto.UserDto;
 import com.codehive.repository.RoleRepository;
@@ -55,5 +56,17 @@ public class AdminController {
     public ResponseEntity<String> removeRolesFromUser(@PathVariable Long userId, @RequestBody RoleRequest roleRequest) {
         adminService.removeRolesFromUser(userId, roleRequest.getRoleNames());
         return ResponseEntity.ok("Roles removed successfully");
+    }
+
+    @PostMapping("/roles/{roleId}/permissions")
+    public ResponseEntity<String> assignPermissions(@PathVariable Long roleId, @RequestBody PermissionRequest request){
+        adminService.assignPermissionsToRole(roleId, request.getPermissionNames());
+        return ResponseEntity.ok("Permissions assigned successfully");
+    }
+
+    @DeleteMapping("/roles/{roleId}/permissions")
+    public ResponseEntity<String> removePermissions(@PathVariable Long roleId, @RequestBody PermissionRequest request){
+        adminService.removePermissionsFromRole(roleId, request.getPermissionNames());
+        return ResponseEntity.ok("Permissions removed successfully");
     }
 }

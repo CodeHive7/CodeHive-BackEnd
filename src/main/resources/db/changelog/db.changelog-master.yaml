@@ -103,7 +103,7 @@ databaseChangeLog:
                   valueNumeric: "1"
               - column:
                   name: "name"
-                  value: "ROLE_USER"
+                  value: "USER"
         - insert:
             tableName: "roles"
             columns:
@@ -112,7 +112,7 @@ databaseChangeLog:
                   valueNumeric: "2"
               - column:
                   name: "name"
-                  value: "ROLE_ADMIN"
+                  value: "ADMIN"
   - changeSet:
       id: 5
       author: "SimoAcharouaou"
@@ -161,3 +161,270 @@ databaseChangeLog:
                   defaultValueBoolean: true
                   constraints:
                     nullable: false
+  - changeSet:
+      id: 7
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                    name: "name"
+                    type: "VARCHAR(255)"
+                    constraints:
+                        nullable: false
+                        unique: true
+        - createTable:
+            tableName: "role_permissions"
+            columns:
+              - column:
+                  name: "role_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "permission_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "role_permissions"
+            baseColumnNames: "role_id"
+            referencedTableName: "roles"
+            referencedColumnNames: "id"
+            constraintName: "fk_role_permissions_role"
+
+        - addForeignKeyConstraint:
+            baseTableName: "role_permissions"
+            baseColumnNames: "permission_id"
+            referencedTableName: "permissions"
+            referencedColumnNames: "id"
+            constraintName: "fk_role_permissions_permission"
+
+  - changeSet:
+      id: 8
+      author: "SimoAcharouaou"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "READ_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "DELETE_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "BLOCK_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UNBLOCK_USER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "ASSIGN_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "REMOVE_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "READ_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "DELETE_ROLE"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "ASSIGN_PERMISSION"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "REMOVE_PERMISSION"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "READ_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "DELETE_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "ASSIGN_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "MANAGE_PROJECT_TEAM"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "PLAN_MEETINGS"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "VIEW_MEETINGS"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "COMMENT_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "READ_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "DELETE_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "SUBMIT_TASK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "REVIEW_SUBMISSION"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "EVALUATE_MEMBER"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "VIEW_EVALUATIONS"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "GIVE_FEEDBACK"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "VALIDATE_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "MODERATE_CONTENT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "VIEW_ANALYTICS"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "ACCESS_DASHBOARD"

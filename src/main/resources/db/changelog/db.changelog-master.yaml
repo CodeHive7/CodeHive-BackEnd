@@ -113,6 +113,15 @@ databaseChangeLog:
               - column:
                   name: "name"
                   value: "ADMIN"
+        - insert:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: "id"
+                  valueNumeric: "3"
+              - column:
+                  name: "name"
+                  value: "SUPER_ADMIN"
   - changeSet:
       id: 5
       author: "SimoAcharouaou"

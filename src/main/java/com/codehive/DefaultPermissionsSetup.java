@@ -35,7 +35,7 @@ public class DefaultPermissionsSetup implements CommandLineRunner {
         List<String> userPermissions = List.of(
                 "CREATE_PROJECT", "READ_PROJECT", "UPDATE_PROJECT", "DELETE_PROJECT",
                 "CREATE_TASK", "READ_TASK", "UPDATE_TASK", "DELETE_TASK",
-                "COMMENT_PROJECT", "SUBMIT_TASK"
+                "COMMENT_PROJECT", "SUBMIT_TASK", "APPLY_FOR_POSITION"
         );
 
         List<String> adminPermissions = List.of(

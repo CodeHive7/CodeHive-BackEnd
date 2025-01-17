@@ -1,5 +1,6 @@
 package com.codehive.controller;
 
+import com.codehive.dto.ApplyForPositionRequest;
 import com.codehive.dto.CreateProjectRequest;
 import com.codehive.dto.ProjectResponseDto;
 import com.codehive.service.ProjectService;
@@ -57,5 +58,19 @@ public class ProjectController {
         projectService.deleteProject(projectId, username);
         return ResponseEntity.ok("Project deleted successfully");
     }
+
+//    @PreAuthorize("hasAuthority('APPLY_FOR_POSITION')")
+    @PostMapping("/{projectId}/positions/{positionId}/apply")
+    public ResponseEntity<String> applyForPosition(@PathVariable Long projectId,
+                                                   @PathVariable Long positionId,
+                                                   @RequestBody ApplyForPositionRequest request,
+                                                   @AuthenticationPrincipal User principal
+    ) {
+        String username = principal.getUsername();
+        projectService.applyForPosition(projectId, positionId, username, request);
+        return ResponseEntity.ok("Applied successfully");
+
+    }
+
 
 }

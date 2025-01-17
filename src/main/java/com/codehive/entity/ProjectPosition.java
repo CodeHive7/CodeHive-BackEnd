@@ -18,6 +18,9 @@ public class ProjectPosition {
     private boolean paid;
     private int quantity;
 
+    private String question1;
+    private String question2;
+
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;

@@ -1,13 +1,17 @@
 package com.codehive.service.impl;
 
 import com.codehive.Enum.ProjectStage;
+import com.codehive.dto.ApplyForPositionRequest;
 import com.codehive.dto.CreateProjectRequest;
 import com.codehive.dto.ProjectResponseDto;
+import com.codehive.entity.PositionApplication;
 import com.codehive.entity.Project;
 import com.codehive.entity.ProjectPosition;
 import com.codehive.entity.User;
 import com.codehive.mapper.ProjectMapper;
 import com.codehive.mapper.ProjectPositionMapper;
+import com.codehive.repository.ApplicationRepository;
+import com.codehive.repository.ProjectPositionRepository;
 import com.codehive.repository.ProjectRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.service.ProjectService;
@@ -24,6 +28,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
     private final ProjectMapper projectMapper;
     private final ProjectPositionMapper positionMapper;
+    private final ProjectPositionRepository projectPositionRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public ProjectResponseDto createProject(CreateProjectRequest request, String creatorUsername) {
@@ -92,5 +98,50 @@ public class ProjectServiceImpl implements ProjectService {
             throw new RuntimeException("You are not allowed to delete this project");
         }
         projectRepository.delete(project);
+    }
+
+    @Override
+    public void applyForPosition(Long projectId, Long positionId, String username, ApplyForPositionRequest request) {
+        User applicant = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        ProjectPosition position = projectPositionRepository.findById(positionId)
+                .orElseThrow(() -> new RuntimeException("Position not found"));
+
+        if(!position.getProject().getId().equals(projectId)) {
+            throw new RuntimeException("Position does not belong to this project");
+        }
+
+        if(position.getQuantity() <= 0) {
+            throw new RuntimeException("Position is already filled");
+        }
+        if(position.getQuestion1() != null && !position.getQuestion1().isBlank()) {
+            if(request.getAnswer1() == null || request.getAnswer1().isBlank()) {
+                throw new RuntimeException("You must provide an answer for question1");
+            }
+        }
+        if(position.getQuestion2() != null && !position.getQuestion2().isBlank()) {
+            if(request.getAnswer2() == null || request.getAnswer2().isBlank()) {
+                throw new RuntimeException("You must provide an answer for question2");
+            }
+        }
+        if(applicationRepository.existsByApplicantAndPosition(applicant, position)) {
+            throw new RuntimeException("You have already applied for this position");
+        }
+
+        PositionApplication application = new PositionApplication();
+        application.setApplicant(applicant);
+        application.setPosition(position);
+        application.setAnswer1(request.getAnswer1());
+        application.setAnswer2(request.getAnswer2());
+
+        position.setQuantity(position.getQuantity() - 1);
+
+        applicationRepository.save(application);
+        projectPositionRepository.save(position);
+
     }
 }

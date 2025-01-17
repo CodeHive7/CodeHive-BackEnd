@@ -1,5 +1,6 @@
 package com.codehive.service;
 
+import com.codehive.dto.ApplyForPositionRequest;
 import com.codehive.dto.CreateProjectRequest;
 import com.codehive.dto.ProjectResponseDto;
 
@@ -10,5 +11,6 @@ public interface ProjectService {
     List<ProjectResponseDto> getMyProjects(String username);
     ProjectResponseDto updateProject(Long projectId, CreateProjectRequest request , String username);
     void deleteProject(Long projectId, String username);
+    void applyForPosition(Long projectId, Long positionId, String username, ApplyForPositionRequest request);
 
 }

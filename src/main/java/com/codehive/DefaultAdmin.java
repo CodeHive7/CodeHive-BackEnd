@@ -35,12 +35,11 @@ public class DefaultAdmin implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        Role adminRole = roleRepository.findByName("ADMIN")
+        Role adminRole = roleRepository.findByName("SUPER_ADMIN")
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         List<Permissions> allPermissions = permissionsRepository.findAll();
         adminRole.getPermissions().addAll(allPermissions);
-//      allPermissions.forEach(p -> p.getRoles().add(adminRole));
         roleRepository.save(adminRole);
 
         var optionalUser = userRepository.findByUsername(username);

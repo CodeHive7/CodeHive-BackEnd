@@ -36,8 +36,11 @@ public class ProjectServiceImpl implements ProjectService {
         User creator = userRepository.findByUsername(creatorUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+
         Project project = projectMapper.toEntity(request);
         project.setCreator(creator);
+        project.setQuestion1(request.getQuestion1());
+        project.setQuestion2(request.getQuestion2());
 
         if(request.getPositions() != null) {
             request.getPositions().forEach(posReq -> {
@@ -115,15 +118,19 @@ public class ProjectServiceImpl implements ProjectService {
             throw new RuntimeException("Position does not belong to this project");
         }
 
+        if(project.getCreator().getId().equals(applicant.getId())) {
+            throw new RuntimeException("You cannot apply for your own project");
+        }
+
         if(position.getQuantity() <= 0) {
             throw new RuntimeException("Position is already filled");
         }
-        if(position.getQuestion1() != null && !position.getQuestion1().isBlank()) {
+        if(project.getQuestion1() != null && !project.getQuestion1().isBlank()) {
             if(request.getAnswer1() == null || request.getAnswer1().isBlank()) {
                 throw new RuntimeException("You must provide an answer for question1");
             }
         }
-        if(position.getQuestion2() != null && !position.getQuestion2().isBlank()) {
+        if(project.getQuestion2() != null && !project.getQuestion2().isBlank()) {
             if(request.getAnswer2() == null || request.getAnswer2().isBlank()) {
                 throw new RuntimeException("You must provide an answer for question2");
             }

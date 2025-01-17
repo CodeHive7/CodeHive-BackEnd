@@ -588,7 +588,7 @@ databaseChangeLog:
       author: "SimoAcharouaou777"
       changes:
         - addColumn:
-            tableName: "project_positions"
+            tableName: "projects"
             columns:
               - column:
                   name: "question1"

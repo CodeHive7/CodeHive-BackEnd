@@ -31,6 +31,9 @@ public class Project {
     private String websiteUrl;
     private String problemToFix;
 
+    private String question1;
+    private String question2;
+
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;

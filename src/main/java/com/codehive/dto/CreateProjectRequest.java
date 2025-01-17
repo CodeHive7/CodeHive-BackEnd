@@ -14,6 +14,8 @@ public class CreateProjectRequest {
     private String category;
     private String websiteUrl;
     private String problemToFix;
+    private String question1;
+    private String question2;
 
     private List<PositionRequest> positions;
 }

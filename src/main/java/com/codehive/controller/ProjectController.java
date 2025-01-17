@@ -63,9 +63,13 @@ public class ProjectController {
     @PostMapping("/{projectId}/positions/{positionId}/apply")
     public ResponseEntity<String> applyForPosition(@PathVariable Long projectId,
                                                    @PathVariable Long positionId,
-                                                   @RequestBody ApplyForPositionRequest request,
+                                                   @RequestBody(required = false) ApplyForPositionRequest request,
                                                    @AuthenticationPrincipal User principal
     ) {
+        if(request == null) {
+            request = new ApplyForPositionRequest();
+        }
+
         String username = principal.getUsername();
         projectService.applyForPosition(projectId, positionId, username, request);
         return ResponseEntity.ok("Applied successfully");

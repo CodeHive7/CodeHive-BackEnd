@@ -4,16 +4,10 @@ import com.codehive.Enum.ProjectStage;
 import com.codehive.dto.ApplyForPositionRequest;
 import com.codehive.dto.CreateProjectRequest;
 import com.codehive.dto.ProjectResponseDto;
-import com.codehive.entity.PositionApplication;
-import com.codehive.entity.Project;
-import com.codehive.entity.ProjectPosition;
-import com.codehive.entity.User;
+import com.codehive.entity.*;
 import com.codehive.mapper.ProjectMapper;
 import com.codehive.mapper.ProjectPositionMapper;
-import com.codehive.repository.ApplicationRepository;
-import com.codehive.repository.ProjectPositionRepository;
-import com.codehive.repository.ProjectRepository;
-import com.codehive.repository.UserRepository;
+import com.codehive.repository.*;
 import com.codehive.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,17 +24,23 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectPositionMapper positionMapper;
     private final ProjectPositionRepository projectPositionRepository;
     private final ApplicationRepository applicationRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public ProjectResponseDto createProject(CreateProjectRequest request, String creatorUsername) {
         User creator = userRepository.findByUsername(creatorUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Category category = resolveCategory(request);
+        ProjectStage stage = resolveStage(request);
 
         Project project = projectMapper.toEntity(request);
         project.setCreator(creator);
+        project.setCategory(category);
+        project.setStage(stage);
         project.setQuestion1(request.getQuestion1());
         project.setQuestion2(request.getQuestion2());
+
 
         if(request.getPositions() != null) {
             request.getPositions().forEach(posReq -> {
@@ -73,10 +73,14 @@ public class ProjectServiceImpl implements ProjectService {
         if(!project.getCreator().getUsername().equals(username)) {
             throw new RuntimeException("You are not allowed to update this project");
         }
+        Category category = resolveCategory(request);
+
+        ProjectStage stage = resolveStage(request);
+
         project.setName(request.getName());
         project.setDescription(request.getDescription());
-        project.setStage(ProjectStage.valueOf(request.getStage()));
-        project.setCategory(request.getCategory());
+        project.setCategory(category);
+        project.setStage(stage);
         project.setWebsiteUrl(request.getWebsiteUrl());
         project.setProblemToFix(request.getProblemToFix());
 
@@ -90,6 +94,33 @@ public class ProjectServiceImpl implements ProjectService {
         }
         Project saved = projectRepository.save(project);
         return projectMapper.toDto(saved);
+    }
+
+    private Category resolveCategory(CreateProjectRequest request) {
+        if (request.getCustomCategory() != null && !request.getCustomCategory().isBlank()) {
+            return categoryRepository.findByName(request.getCustomCategory())
+                    .orElseGet(() -> {
+                        Category newCategory = new Category();
+                        newCategory.setName(request.getCustomCategory());
+                        return categoryRepository.save(newCategory);
+                    });
+        } else if (request.getSelectedCategory() != null && !request.getSelectedCategory().isBlank()) {
+            return categoryRepository.findByName(request.getSelectedCategory())
+                    .orElseThrow(() -> new RuntimeException("Selected category does not exist"));
+        } else {
+            throw new RuntimeException("A category must be selected or provided");
+        }
+    }
+
+    private ProjectStage resolveStage(CreateProjectRequest request) {
+        if (request.getStage() == null || request.getStage().isBlank()) {
+            throw new RuntimeException("Project stage must be selected");
+        }
+        try {
+            return ProjectStage.valueOf(request.getStage().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid project stage. Accepted values: " + List.of(ProjectStage.values()));
+        }
     }
 
     @Override

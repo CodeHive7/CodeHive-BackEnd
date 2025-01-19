@@ -1,12 +1,10 @@
 package com.codehive.controller;
 
-import com.codehive.dto.CreateUserRequest;
-import com.codehive.dto.PermissionRequest;
-import com.codehive.dto.RoleRequest;
-import com.codehive.dto.UserDto;
+import com.codehive.dto.*;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.service.AdminService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,5 +75,18 @@ public class AdminController {
     public ResponseEntity<String> removePermissions(@PathVariable Long roleId, @RequestBody PermissionRequest request){
         adminService.removePermissionsFromRole(roleId, request.getPermissionNames());
         return ResponseEntity.ok("Permissions removed successfully");
+    }
+
+    @PreAuthorize("hasAuthority('CREATE_CATEGORY')")
+    @PostMapping("/categories")
+    public ResponseEntity<String> createCategory(@RequestBody CategoryRequest categoryRequest) {
+        adminService.createCategory(categoryRequest.getName());
+        return ResponseEntity.ok("Category created successfully");
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> listCategories() {
+        List<String> categories = adminService.listCategories();
+        return ResponseEntity.ok(categories);
     }
 }

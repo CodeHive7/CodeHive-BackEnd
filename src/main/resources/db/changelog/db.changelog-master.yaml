@@ -113,6 +113,15 @@ databaseChangeLog:
               - column:
                   name: "name"
                   value: "ADMIN"
+        - insert:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: "id"
+                  valueNumeric: "3"
+              - column:
+                  name: "name"
+                  value: "SUPER_ADMIN"
   - changeSet:
       id: 5
       author: "SimoAcharouaou"
@@ -517,5 +526,128 @@ databaseChangeLog:
             referencedTableName: "projects"
             referencedColumnNames: "id"
             constraintName: "fk_project_positions_project"
-
-
+  - changeSet:
+      id: 11
+      author: "SimoAcharouaou"
+      changes:
+        - createTable:
+            tableName: "position_applications"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "applicant_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "position_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "answer1"
+                  type: "VARCHAR(1000)"
+              - column:
+                    name: "answer2"
+                    type: "VARCHAR(1000)"
+              - column:
+                  name: "status"
+                  type: "VARCHAR(50)"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "position_applications"
+            baseColumnNames: "applicant_id"
+            referencedTableName: "users"
+            referencedColumnNames: "id"
+            constraintName: "fk_position_applications_applicant"
+        - addForeignKeyConstraint:
+            baseTableName: "position_applications"
+            baseColumnNames: "position_id"
+            referencedTableName: "project_positions"
+            referencedColumnNames: "id"
+            constraintName: "fk_position_applications_position"
+  - changeSet:
+      id: 12
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "APPLY_FOR_POSITION"
+  - changeSet:
+      id: 13
+      author: "SimoAcharouaou777"
+      changes:
+        - addColumn:
+            tableName: "projects"
+            columns:
+              - column:
+                  name: "question1"
+                  type: "VARCHAR(1000)"
+                  constraints:
+                    nullable: true
+              - column:
+                  name: "question2"
+                  type: "VARCHAR(1000)"
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 14
+      author: "SimoAcharouaou777"
+      changes:
+        - createTable:
+            tableName: "categories"
+            columns:
+              - column:
+                  name: "id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "name"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 15
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_CATEGORY"
+  - changeSet:
+      id: 16
+      author: "SimoAcharouaou777"
+      changes:
+        - dropColumn:
+            tableName: "projects"
+            columnName: "category"
+        - addColumn:
+            tableName: "projects"
+            columns:
+              - column:
+                  name: "category_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "projects"
+            baseColumnNames: "category_id"
+            referencedTableName: "categories"
+            referencedColumnNames: "id"
+            constraintName: "fk_projects_category"

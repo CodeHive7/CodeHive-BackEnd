@@ -2,10 +2,12 @@ package com.codehive.service.impl;
 
 import com.codehive.dto.CreateUserRequest;
 import com.codehive.dto.UserDto;
+import com.codehive.entity.Category;
 import com.codehive.entity.Permissions;
 import com.codehive.entity.Role;
 import com.codehive.entity.User;
 import com.codehive.mapper.UserMapper;
+import com.codehive.repository.CategoryRepository;
 import com.codehive.repository.PermissionsRepository;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
@@ -29,6 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final PermissionsRepository permissionsRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -129,5 +132,22 @@ public class AdminServiceImpl implements AdminService {
             permission.getRoles().remove(role);
         }
         roleRepository.save(role);
+    }
+
+    @Override
+    public void createCategory(String categoryName) {
+        if(categoryRepository.findByName(categoryName).isPresent()) {
+            throw new RuntimeException("Category already exists");
+        }
+        Category category = new Category();
+        category.setName(categoryName);
+        categoryRepository.save(category);
+    }
+
+    @Override
+    public List<String> listCategories() {
+        return categoryRepository.findAll().stream()
+                .map(Category::getName)
+                .collect(Collectors.toList());
     }
 }

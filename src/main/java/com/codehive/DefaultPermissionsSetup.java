@@ -42,7 +42,7 @@ public class DefaultPermissionsSetup implements CommandLineRunner {
                 "CREATE_PROJECT", "READ_PROJECT", "UPDATE_PROJECT", "DELETE_PROJECT",
                 "CREATE_TASK", "READ_TASK", "UPDATE_TASK", "DELETE_TASK",
                 "COMMENT_PROJECT", "SUBMIT_TASK",
-                "BLOCK_USER", "UNBLOCK_USER"
+                "BLOCK_USER", "UNBLOCK_USER","CREATE_CATEGORY"
         );
 
 

@@ -27,7 +27,6 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStage stage;
 
-    private String category;
     private String websiteUrl;
     private String problemToFix;
 
@@ -37,6 +36,10 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProjectPosition> positions = new HashSet<>();

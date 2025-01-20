@@ -14,4 +14,5 @@ public interface ProjectService {
     List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username);
     void updateApplicationStatus(String username , ApplicationUpdateRequest request);
 
+
 }

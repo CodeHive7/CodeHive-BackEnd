@@ -15,6 +15,10 @@ public interface ApplicationRepository extends JpaRepository<PositionApplication
     boolean existsByApplicantAndPosition(User applicant, ProjectPosition position);
     Optional<PositionApplication> findByApplicantAndPosition(User applicant, ProjectPosition position);
     List<PositionApplication> findByApplicant(User applicant);
+    @Query("SELECT COUNT(pa) > 0 FROM PositionApplication pa " +
+           "JOIN pa.position pos " +
+           "WHERE pa.applicant = :applicant AND pos.project = :project")
+    boolean existsByApplicantAndProject(@Param("applicant") User applicant, @Param("project") Project project);
 
     @Query("""
             SELECT pa FROM PositionApplication pa

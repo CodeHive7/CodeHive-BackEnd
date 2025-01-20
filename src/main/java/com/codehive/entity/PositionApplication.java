@@ -29,6 +29,9 @@ public class PositionApplication {
     @Column(length = 1000)
     private String answer2;
 
+    @Column(length = 2000)
+    private String feedback;
+
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status = ApplicationStatus.PENDING;
 

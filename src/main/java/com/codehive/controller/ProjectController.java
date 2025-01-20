@@ -1,9 +1,6 @@
 package com.codehive.controller;
 
-import com.codehive.dto.ApplicantResponseDto;
-import com.codehive.dto.ApplyForPositionRequest;
-import com.codehive.dto.CreateProjectRequest;
-import com.codehive.dto.ProjectResponseDto;
+import com.codehive.dto.*;
 import com.codehive.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -92,4 +89,15 @@ public class ProjectController {
         List<ApplicantResponseDto> applicants = projectService.getApplicantsForProject(projectId, username);
         return ResponseEntity.ok(applicants);
     }
+
+    @PreAuthorize("hasAuthority('UPDATE_APPLICATION_STATUS')")
+    @PutMapping("/{projectId}/applications")
+    public ResponseEntity<String> updateApplications(@PathVariable Long projectId,
+                                                     @RequestBody ApplicationUpdateRequest request,
+                                                     @AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        projectService.updateApplicationStatus(username, request);
+        return ResponseEntity.ok("Application updated successfully");
+    }
+
 }

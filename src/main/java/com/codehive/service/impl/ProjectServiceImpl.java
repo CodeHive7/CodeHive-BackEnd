@@ -1,12 +1,11 @@
 package com.codehive.service.impl;
 
+import com.codehive.Enum.ApplicationStatus;
 import com.codehive.Enum.ProjectStage;
-import com.codehive.dto.ApplicantResponseDto;
-import com.codehive.dto.ApplyForPositionRequest;
-import com.codehive.dto.CreateProjectRequest;
-import com.codehive.dto.ProjectResponseDto;
+import com.codehive.dto.*;
 import com.codehive.entity.*;
 import com.codehive.exception.PositionUnavailableException;
+import com.codehive.mapper.ApplicantMapper;
 import com.codehive.mapper.ProjectMapper;
 import com.codehive.mapper.ProjectPositionMapper;
 import com.codehive.repository.*;
@@ -27,6 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectPositionRepository projectPositionRepository;
     private final ApplicationRepository applicationRepository;
     private final CategoryRepository categoryRepository;
+    private final ApplicantMapper applicantMapper;
 
     @Override
     public ProjectResponseDto createProject(CreateProjectRequest request, String creatorUsername) {
@@ -196,6 +196,7 @@ public class ProjectServiceImpl implements ProjectService {
                     Project project = application.getPosition().getProject();
                     ProjectResponseDto dto = projectMapper.toDto(project);
                     dto.setApplicationStatus(application.getStatus().name());
+                    dto.setFeedback(application.getFeedback());
                     return dto;
                 })
                 .toList();
@@ -213,14 +214,36 @@ public class ProjectServiceImpl implements ProjectService {
         List<PositionApplication> applications = applicationRepository.findByProject(project);
 
         return applications.stream()
-                .map(application -> {
-                    ApplicantResponseDto dto = new ApplicantResponseDto();
-                    dto.setApplicantName(application.getApplicant().getFullName());
-                    dto.setApplicantUsername(application.getApplicant().getUsername());
-                    dto.setPositionName(application.getPosition().getRoleName());
-                    dto.setApplicationStatus(application.getStatus().name());
-                    return dto;
-                })
+                .map(applicantMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public void updateApplicationStatus(String username, ApplicationUpdateRequest request) {
+        if(request.getApplicationIds() == null || request.getApplicationIds().isEmpty()) {
+            throw new RuntimeException("No applications selected for update");
+        }
+
+        List<PositionApplication> applications = applicationRepository.findAllById(request.getApplicationIds());
+
+        if(applications.isEmpty()) {
+            throw new RuntimeException("No Valid applications found.");
+        }
+
+        for(PositionApplication application : applications) {
+            Project project = application.getPosition().getProject();
+
+            if(!project.getCreator().getUsername().equals(username)) {
+                throw new RuntimeException("You are not authorized to update this application");
+            }
+
+            if(request.isAccept()) {
+                application.setStatus(ApplicationStatus.ACCEPTED);
+            } else {
+                application.setStatus(ApplicationStatus.REJECTED);
+                application.setFeedback(request.getFeedback());
+            }
+        }
+        applicationRepository.saveAll(applications);
     }
 }

@@ -17,5 +17,6 @@ public class ProjectResponseDto {
     private String problemToFix;
     private List<PositionResponseDto> positions;
     private String applicationStatus;
+    private String feedback;
 
 }

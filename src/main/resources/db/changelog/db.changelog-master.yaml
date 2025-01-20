@@ -651,3 +651,25 @@ databaseChangeLog:
             referencedTableName: "categories"
             referencedColumnNames: "id"
             constraintName: "fk_projects_category"
+  - changeSet:
+      id: 17
+      author: "SimoAcharouaou777"
+      changes:
+        - addColumn:
+            tableName: "position_applications"
+            columns:
+              - column:
+                  name: "feedback"
+                  type: "VARCHAR(2000)"
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 18
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_APPLICATION_STATUS"

@@ -16,5 +16,6 @@ public class ProjectResponseDto {
     private String websiteUrl;
     private String problemToFix;
     private List<PositionResponseDto> positions;
+    private String applicationStatus;
 
 }

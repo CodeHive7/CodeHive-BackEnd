@@ -1,10 +1,12 @@
 package com.codehive.service.impl;
 
 import com.codehive.Enum.ProjectStage;
+import com.codehive.dto.ApplicantResponseDto;
 import com.codehive.dto.ApplyForPositionRequest;
 import com.codehive.dto.CreateProjectRequest;
 import com.codehive.dto.ProjectResponseDto;
 import com.codehive.entity.*;
+import com.codehive.exception.PositionUnavailableException;
 import com.codehive.mapper.ProjectMapper;
 import com.codehive.mapper.ProjectPositionMapper;
 import com.codehive.repository.*;
@@ -154,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         if(position.getQuantity() <= 0) {
-            throw new RuntimeException("Position is already filled");
+            throw new PositionUnavailableException("No available space for this position. Position is already filled");
         }
         if(project.getQuestion1() != null && !project.getQuestion1().isBlank()) {
             if(request.getAnswer1() == null || request.getAnswer1().isBlank()) {
@@ -181,5 +183,44 @@ public class ProjectServiceImpl implements ProjectService {
         applicationRepository.save(application);
         projectPositionRepository.save(position);
 
+    }
+
+    @Override
+    public List<ProjectResponseDto> getProjectsUserAppliedTo(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<PositionApplication> applications = applicationRepository.findByApplicantWithProject(user);
+
+        return applications.stream()
+                .map(application -> {
+                    Project project = application.getPosition().getProject();
+                    ProjectResponseDto dto = projectMapper.toDto(project);
+                    dto.setApplicationStatus(application.getStatus().name());
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        if(!project.getCreator().getUsername().equals(username)) {
+            throw new RuntimeException("You are not authorized to view applicantss for this project");
+        }
+
+        List<PositionApplication> applications = applicationRepository.findByProject(project);
+
+        return applications.stream()
+                .map(application -> {
+                    ApplicantResponseDto dto = new ApplicantResponseDto();
+                    dto.setApplicantName(application.getApplicant().getFullName());
+                    dto.setApplicantUsername(application.getApplicant().getUsername());
+                    dto.setPositionName(application.getPosition().getRoleName());
+                    dto.setApplicationStatus(application.getStatus().name());
+                    return dto;
+                })
+                .toList();
     }
 }

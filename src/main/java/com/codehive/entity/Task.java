@@ -24,6 +24,6 @@ public class Task {
 
     private String title;
     private String description;
-    private String status; // pending doing done
+    private String status; // todo doing done
     private LocalDate dueDate;
 }

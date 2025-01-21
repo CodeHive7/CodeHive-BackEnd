@@ -1,5 +1,6 @@
 package com.codehive.repository;
 
+import com.codehive.Enum.ApplicationStatus;
 import com.codehive.entity.PositionApplication;
 import com.codehive.entity.Project;
 import com.codehive.entity.ProjectPosition;
@@ -33,4 +34,7 @@ public interface ApplicationRepository extends JpaRepository<PositionApplication
            "JOIN FETCH pa.position pas " +
            "WHERE pas.project = :project")
     List<PositionApplication> findByProject(@Param("project") Project project);
+
+    boolean existsByApplicantAndPosition_ProjectAndStatus(User applicant, Project project , ApplicationStatus status);
+
 }

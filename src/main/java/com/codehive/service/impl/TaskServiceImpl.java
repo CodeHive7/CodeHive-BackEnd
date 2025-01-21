@@ -95,14 +95,19 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDto updateTaskStatus(Long taskId, String username, String status) {
-        Task task = taskRepository.findById(taskId)
+        List<String> validStatuses = List.of("TODO", "DOING", "DONE");
+        if(!validStatuses.contains(status.toUpperCase())) {
+            throw new IllegalArgumentException("Invalid status. Allowed values: TODO, DOING, DONE");
+        }
+
+        Task task = taskRepository.findByIdWithAssignedUser(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         if (!task.getAssignedTo().getUsername().equals(username)) {
             throw new RuntimeException("You are not authorized to update the status of this task");
         }
 
-        task.setStatus(status);
+        task.setStatus(status.toUpperCase());
         taskRepository.save(task);
 
         return taskMapper.toDto(task);

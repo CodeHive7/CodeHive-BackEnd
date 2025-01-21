@@ -4,6 +4,7 @@ import com.codehive.dto.CreateTaskRequest;
 import com.codehive.dto.TaskDto;
 import com.codehive.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -39,13 +41,22 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @PreAuthorize("hasAuthority('READ_TASK')")
+    @GetMapping("/my-tasks")
+    public ResponseEntity<List<TaskDto>> getUserTasks(@AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        List<TaskDto> tasks = taskService.getUserTasks(username);
+        return ResponseEntity.ok(tasks);
+    }
+
     @PreAuthorize("hasAuthority('UPDATE_TASK_STATUS')")
-    @PutMapping("/tasks/{taskId}/status")
+    @PutMapping("/{taskId}/status")
     public ResponseEntity<TaskDto> updateTaskStatus(
             @PathVariable Long taskId,
-            @RequestParam String status,
+            @RequestBody Map<String,String> requestBody,
             @AuthenticationPrincipal User principal) {
         String username = principal.getUsername();
+        String status = requestBody.get("status");
         TaskDto dto = taskService.updateTaskStatus(taskId, username, status);
         return ResponseEntity.ok(dto);
     }

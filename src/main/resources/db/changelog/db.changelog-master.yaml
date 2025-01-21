@@ -757,3 +757,14 @@ databaseChangeLog:
             constraintName: "fk_announcement_project"
             referencedTableName: "projects"
             referencedColumnNames: "id"
+
+  - changeSet:
+      id: 21
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "UPDATE_TASK_STATUS"

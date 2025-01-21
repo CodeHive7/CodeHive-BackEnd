@@ -1,11 +1,13 @@
 package com.codehive.service.impl;
 
+import com.codehive.Enum.ApplicationStatus;
 import com.codehive.dto.CreateTaskRequest;
 import com.codehive.dto.TaskDto;
 import com.codehive.entity.Project;
 import com.codehive.entity.Task;
 import com.codehive.entity.User;
 import com.codehive.mapper.TaskMapper;
+import com.codehive.repository.ApplicationRepository;
 import com.codehive.repository.ProjectRepository;
 import com.codehive.repository.TaskRepository;
 import com.codehive.repository.UserRepository;
@@ -24,6 +26,7 @@ public class TaskServiceImpl implements TaskService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public TaskDto createTask(Long projectId, CreateTaskRequest request, String ownerUsername) {
@@ -35,6 +38,12 @@ public class TaskServiceImpl implements TaskService {
         }
         User assignedTo = userRepository.findById(request.getAssignedToUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        boolean isUserAccepted = applicationRepository.existsByApplicantAndPosition_ProjectAndStatus(
+                assignedTo , project , ApplicationStatus.ACCEPTED );
+        if(!isUserAccepted) {
+            throw new RuntimeException("The user must have an accepted application for this project to be assigned a task");
+        }
 
         Task task = new Task();
         task.setProject(project);
@@ -53,6 +62,20 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(project.getCreator().getId().equals(user.getId())) {
+            return taskRepository.findByProject(project)
+                    .stream()
+                    .map(taskMapper::toDto)
+                    .collect(Collectors.toList());
+        }
+        boolean isPartOfTeam = applicationRepository.existsByApplicantAndPosition_ProjectAndStatus(
+                user, project , ApplicationStatus.ACCEPTED);
+        if(!isPartOfTeam) {
+            throw new RuntimeException("You are not authorized to view tasks for this project");
+        }
         return taskRepository.findByProject(project)
                 .stream()
                 .map(taskMapper::toDto)

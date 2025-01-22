@@ -13,6 +13,10 @@ public interface ProjectService {
     List<ProjectResponseDto> getProjectsUserAppliedTo(String username);
     List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username);
     void updateApplicationStatus(String username , ApplicationUpdateRequest request);
+    void acceptProject(Long projectId, String adminUsername);
+    void rejectProject(Long projectId, String adminUsername, String feedback);
+    List<ProjectResponseDto> getAcceptedProjects();
+    List<ProjectResponseDto> getRejectedProjects();
 
 
 }

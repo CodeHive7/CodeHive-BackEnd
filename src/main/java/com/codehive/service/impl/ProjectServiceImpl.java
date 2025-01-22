@@ -2,6 +2,7 @@ package com.codehive.service.impl;
 
 import com.codehive.Enum.ApplicationStatus;
 import com.codehive.Enum.ProjectStage;
+import com.codehive.Enum.ProjectStatus;
 import com.codehive.dto.*;
 import com.codehive.entity.*;
 import com.codehive.exception.PositionUnavailableException;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
         project.setStage(stage);
         project.setQuestion1(request.getQuestion1());
         project.setQuestion2(request.getQuestion2());
+        project.setStatus(ProjectStatus.PENDING);
 
 
         if(request.getPositions() != null) {
@@ -85,6 +88,10 @@ public class ProjectServiceImpl implements ProjectService {
         project.setStage(stage);
         project.setWebsiteUrl(request.getWebsiteUrl());
         project.setProblemToFix(request.getProblemToFix());
+
+        if(project.getStatus() != ProjectStatus.PENDING) {
+            project.setStatus(ProjectStatus.PENDING);
+        }
 
         project.getPositions().clear();
         if(request.getPositions() != null) {
@@ -245,5 +252,46 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         applicationRepository.saveAll(applications);
+    }
+
+    @Override
+    public void acceptProject(Long projectId, String adminUsername) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        if(project.getStatus() != ProjectStatus.PENDING) {
+            throw new RuntimeException("Only pending projects can be accepted");
+        }
+
+        project.setStatus(ProjectStatus.ACCEPTED);
+        projectRepository.save(project);
+    }
+
+    @Override
+    public void rejectProject(Long projectId, String adminUsername, String feedback) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        if(project.getStatus() != ProjectStatus.PENDING) {
+            throw new RuntimeException("Only pending projects can be rejected");
+        }
+        project.setStatus(ProjectStatus.REJECTED);
+        projectRepository.save(project);
+    }
+
+    @Override
+    public List<ProjectResponseDto> getAcceptedProjects() {
+        List<Project> acceptedProjects = projectRepository.findByStatus(ProjectStatus.ACCEPTED);
+        return acceptedProjects.stream()
+                .map(projectMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectResponseDto> getRejectedProjects() {
+        List<Project> rejectedProjects = projectRepository.findByStatus(ProjectStatus.REJECTED);
+        return rejectedProjects.stream()
+                .map(projectMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -36,14 +36,15 @@ public class DefaultPermissionsSetup implements CommandLineRunner {
                 "CREATE_PROJECT", "READ_PROJECT", "UPDATE_PROJECT", "DELETE_PROJECT",
                 "CREATE_TASK", "READ_TASK", "UPDATE_TASK", "DELETE_TASK",
                 "COMMENT_PROJECT", "SUBMIT_TASK", "APPLY_FOR_POSITION" , "UPDATE_APPLICATION_STATUS",
-                "UPDATE_TASK_STATUS"
+                "UPDATE_TASK_STATUS" , "READ_ANNOUNCEMENT" , "CREATE_ANNOUNCEMENT"
         );
 
         List<String> adminPermissions = List.of(
                 "CREATE_PROJECT", "READ_PROJECT", "UPDATE_PROJECT", "DELETE_PROJECT",
                 "CREATE_TASK", "READ_TASK", "UPDATE_TASK", "DELETE_TASK",
                 "COMMENT_PROJECT", "SUBMIT_TASK",
-                "BLOCK_USER", "UNBLOCK_USER","CREATE_CATEGORY" , "UPDATE_APPLICATION_STATUS"
+                "BLOCK_USER", "UNBLOCK_USER","CREATE_CATEGORY" , "UPDATE_APPLICATION_STATUS",
+                "ACCEPT_PROJECT", "REJECT_PROJECT" , "READ_ANNOUNCEMENT" , "CREATE_ANNOUNCEMENT"
         );
 
 

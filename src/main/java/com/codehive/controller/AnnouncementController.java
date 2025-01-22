@@ -20,7 +20,7 @@ public class AnnouncementController {
     private final AnnouncementService announcementService;
 
     @PreAuthorize("hasAuthority('CREATE_ANNOUNCEMENT')")
-    @PostMapping("/{projectId}/announcements")
+    @PostMapping("/{projectId}")
     public ResponseEntity<AnnouncementDto> createAnnouncement(@PathVariable Long projectId, @RequestBody CreateAnnouncementRequest request, @AuthenticationPrincipal User principal) {
         String  username = principal.getUsername();
         AnnouncementDto dto = announcementService.createAnnouncement(projectId, request.getContent(), username);
@@ -28,7 +28,7 @@ public class AnnouncementController {
     }
 
     @PreAuthorize("hasAuthority('READ_ANNOUNCEMENT')")
-    @GetMapping("/{projectId}/announcements")
+    @GetMapping("/{projectId}")
     public ResponseEntity<List<AnnouncementDto>> getAnnouncements(
             @PathVariable Long projectId,
             @AuthenticationPrincipal User principal) {

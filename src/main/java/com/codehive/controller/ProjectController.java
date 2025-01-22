@@ -100,4 +100,18 @@ public class ProjectController {
         return ResponseEntity.ok("Application updated successfully");
     }
 
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/accepted")
+    public ResponseEntity<List<ProjectResponseDto>> getAcceptedProjects() {
+        List<ProjectResponseDto> projects = projectService.getAcceptedProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/rejected")
+    public ResponseEntity<List<ProjectResponseDto>> getRejectedProjects() {
+        List<ProjectResponseDto> projects = projectService.getRejectedProjects();
+        return ResponseEntity.ok(projects);
+    }
+
 }

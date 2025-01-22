@@ -768,3 +768,48 @@ databaseChangeLog:
               - column:
                   name: "name"
                   value: "UPDATE_TASK_STATUS"
+  - changeSet:
+      id: 22
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "ACCEPT_PROJECT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "REJECT_PROJECT"
+  - changeSet:
+      id: 23
+      author: "SimoAcharouaou777"
+      changes:
+        - addColumn:
+            tableName: "projects"
+            columns:
+              - column:
+                  name: "status"
+                  type: "VARCHAR(20)"
+                  defaultValue: 'PENDING'
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 24
+      author: "SimoAcharouaou777"
+      changes:
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "READ_ANNOUNCEMENT"
+        - insert:
+            tableName: "permissions"
+            columns:
+              - column:
+                  name: "name"
+                  value: "CREATE_ANNOUNCEMENT"

@@ -1,5 +1,6 @@
 package com.codehive.repository;
 
+import com.codehive.Enum.ProjectStatus;
 import com.codehive.entity.Project;
 import com.codehive.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project,Long> {
-    List<Project> findByCreator(User creator);
+    List<Project> findByStatus(ProjectStatus status);
     @Query("""
             SELECT p
             FROM Project p

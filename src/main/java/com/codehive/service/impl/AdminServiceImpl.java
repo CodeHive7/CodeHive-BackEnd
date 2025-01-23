@@ -150,4 +150,14 @@ public class AdminServiceImpl implements AdminService {
                 .map(Category::getName)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void assignPermissionsToUser(Long userId, List<String> permissionNames) {
+
+    }
+
+    @Override
+    public void removePermissionsFromUser(Long userId, List<String> permissionNames) {
+
+    }
 }

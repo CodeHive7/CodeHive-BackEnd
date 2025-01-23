@@ -4,10 +4,13 @@ import com.codehive.dto.*;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.service.AdminService;
+import com.codehive.service.ProjectService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class AdminController {
     private final AdminService adminService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ProjectService projectService;
 
     @PreAuthorize("hasRole('ADMIN') and hasAuthority('READ_USER')")
     @GetMapping("users")
@@ -88,5 +92,29 @@ public class AdminController {
     public ResponseEntity<List<String>> listCategories() {
         List<String> categories = adminService.listCategories();
         return ResponseEntity.ok(categories);
+    }
+
+    @PreAuthorize("hasAuthority('ACCEPT_PROJECT')")
+    @PostMapping("/projects/{projectId}/accept")
+    public ResponseEntity<String> acceptProject(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User principal
+            ) {
+        String adminUsername = principal.getUsername();
+        projectService.acceptProject(projectId, adminUsername);
+        return ResponseEntity.ok("Project accepted successfully");
+    }
+
+    @PreAuthorize("hasAuthority('REJECT_PROJECT')")
+    @PostMapping("/projects/{projectId}/reject")
+    public ResponseEntity<String> rejectProject(
+            @PathVariable Long projectId,
+            @RequestBody(required = false) RejectProjectRequest request,
+            @AuthenticationPrincipal User principal
+    ) {
+        String adminUsername = principal.getUsername();
+        String feedback = request != null ? request.getFeedback() : null;
+        projectService.rejectProject(projectId, adminUsername, feedback);
+        return ResponseEntity.ok("Project rejected successfully");
     }
 }

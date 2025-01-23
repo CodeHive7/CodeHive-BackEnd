@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TokenBody {
-    public String refreshToken;
+public class RejectProjectRequest {
+    private String feedback;
 }

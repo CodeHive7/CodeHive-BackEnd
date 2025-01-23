@@ -1,6 +1,7 @@
 package com.codehive.entity;
 
 import com.codehive.Enum.ProjectStage;
+import com.codehive.Enum.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,9 @@ public class Project {
 
     private String question1;
     private String question2;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStatus status = ProjectStatus.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)

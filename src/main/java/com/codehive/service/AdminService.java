@@ -17,4 +17,6 @@ public interface AdminService {
     void removePermissionsFromRole(Long roleId, List<String> permissionNames);
     void createCategory(String categoryName);
     List<String> listCategories();
+    void assignPermissionsToUser(Long userId, List<String> permissionNames);
+    void removePermissionsFromUser(Long userId, List<String> permissionNames);
 }

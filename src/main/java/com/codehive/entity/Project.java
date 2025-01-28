@@ -1,6 +1,7 @@
 package com.codehive.entity;
 
 import com.codehive.Enum.ProjectStage;
+import com.codehive.Enum.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,13 +28,22 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStage stage;
 
-    private String category;
     private String websiteUrl;
     private String problemToFix;
+
+    private String question1;
+    private String question2;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStatus status = ProjectStatus.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProjectPosition> positions = new HashSet<>();

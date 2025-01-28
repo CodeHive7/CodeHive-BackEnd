@@ -20,4 +20,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
     }
 
+    @ExceptionHandler(PositionUnavailableException.class)
+    public ResponseEntity<String> handlePositionUnavailableException(PositionUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
 }

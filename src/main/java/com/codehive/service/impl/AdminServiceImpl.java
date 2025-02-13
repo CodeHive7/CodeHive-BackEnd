@@ -1,6 +1,7 @@
 package com.codehive.service.impl;
 
 import com.codehive.dto.CreateUserRequest;
+import com.codehive.dto.RoleDto;
 import com.codehive.dto.UserDto;
 import com.codehive.entity.Category;
 import com.codehive.entity.Permissions;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +39,18 @@ public class AdminServiceImpl implements AdminService {
     public List<UserDto> findAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(userMapper::toDto)
+                .map(user -> {
+                    UserDto dto = new UserDto();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    dto.setEmail(user.getEmail());
+                    Set<String> roleNames = user.getRoles().stream()
+                            .map(Role::getName)
+                            .collect(Collectors.toSet());
+                    dto.setRoles(roleNames);
+                    dto.setStatus(user.isActive() ? "Active": "Banned");
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -159,5 +172,31 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void removePermissionsFromUser(Long userId, List<String> permissionNames) {
 
+    }
+
+    @Override
+    public List<RoleDto> getAllRoles() {
+        return roleRepository.findAll()
+                .stream()
+                .map(role -> new RoleDto(role.getId(), role.getName(), role.getPermissions()
+                        .stream().map(Permissions::getName).collect(Collectors.toList())))
+                .toList();
+    }
+
+    @Override
+    public List<String> getAllPermissions() {
+        return permissionsRepository.findAll().stream()
+                .map(Permissions::getName)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void createRole(String roleName) {
+        if (roleRepository.findByName(roleName).isPresent()){
+            throw new RuntimeException("Role already exists");
+        }
+        Role newRole = new Role();
+        newRole.setName(roleName);
+        roleRepository.save(newRole);
     }
 }

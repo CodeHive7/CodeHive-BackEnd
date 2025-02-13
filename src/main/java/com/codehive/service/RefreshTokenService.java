@@ -11,4 +11,6 @@ public interface RefreshTokenService {
     void revokeToken(String token);
     boolean isValid(RefreshToken refreshToken);
     RefreshToken rotateRefreshToken(RefreshToken oldToken, String newToken);
+    void deleteByToken(String token);
+    void updateRefreshToken(RefreshToken oldToken, String newToken);
 }

@@ -2,6 +2,7 @@ package com.codehive.service.impl;
 
 import com.codehive.entity.RefreshToken;
 import com.codehive.repository.RefreshTokenRepository;
+import com.codehive.security.JwtTokenProvider;
 import com.codehive.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public RefreshToken createRefreshToken(String username, String token, long expiryDurationMs) {
@@ -57,5 +59,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         newRefreshToken.setRevoked(false);
 
         return refreshTokenRepository.save(newRefreshToken);
+    }
+
+    @Override
+    public void deleteByToken(String token) {
+        refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
+    }
+
+    @Override
+    public void updateRefreshToken(RefreshToken oldToken, String newToken) {
+        oldToken.setToken(newToken);
+        oldToken.setExpiryDate(Instant.now().plusMillis(jwtTokenProvider.getJwtProperties().getRefreshTokenExpiration()));
+        oldToken.setRevoked(false);
+        refreshTokenRepository.save(oldToken);
     }
 }

@@ -47,7 +47,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@RequestBody String refreshToken) {
+    public ResponseEntity<TokenResponse> refresh(@RequestBody Map<String,String> request) {
+        String refreshToken = request.get("refreshToken");
+
         var optional = refreshTokenService.findByToken(refreshToken);
         if(optional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -64,7 +66,7 @@ public class AuthController {
 
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken,true);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(username);
-        refreshTokenService.rotateRefreshToken(existingToken, newRefreshToken);
+        refreshTokenService.updateRefreshToken(existingToken, newRefreshToken);
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(username);
 

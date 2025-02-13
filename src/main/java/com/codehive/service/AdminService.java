@@ -1,6 +1,7 @@
 package com.codehive.service;
 
 import com.codehive.dto.CreateUserRequest;
+import com.codehive.dto.RoleDto;
 import com.codehive.dto.UserDto;
 
 import java.util.List;
@@ -19,4 +20,7 @@ public interface AdminService {
     List<String> listCategories();
     void assignPermissionsToUser(Long userId, List<String> permissionNames);
     void removePermissionsFromUser(Long userId, List<String> permissionNames);
+    List<RoleDto> getAllRoles();
+    List<String> getAllPermissions();
+    void createRole(String roleName);
 }

@@ -25,56 +25,56 @@ public class AdminController {
     private final RoleRepository roleRepository;
     private final ProjectService projectService;
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('READ_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')  and hasAuthority('READ_USER')")
     @GetMapping("users")
     public ResponseEntity<List<UserDto>> listAllUsers() {
         List<UserDto> allUsers = adminService.findAllUsers();
         return ResponseEntity.ok(allUsers);
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('CREATE_USER')")
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequest request) {
         UserDto savedUser = adminService.createUser(request);
         return ResponseEntity.ok(savedUser);
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('BLOCK_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('BLOCK_USER')")
     @PostMapping("/users/{userId}/block")
     public ResponseEntity<String> blockUser(@PathVariable Long userId) {
         adminService.blockUser(userId);
         return ResponseEntity.ok("User blocked successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('UNBLOCK_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('UNBLOCK_USER')")
     @PostMapping("/users/{userId}/unblock")
     public ResponseEntity<String> unblockUser(@PathVariable Long userId) {
         adminService.unblockUser(userId);
         return ResponseEntity.ok("User unblocked successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('ASSIGN_ROLE')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('ASSIGN_ROLE')")
     @PostMapping("/users/{userId}/roles")
     public ResponseEntity<String> assignRolesToUser(@PathVariable Long userId, @RequestBody RoleRequest roleRequest) {
         adminService.assignRolesToUser(userId, roleRequest.getRoleNames());
         return ResponseEntity.ok("Roles assigned successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('REMOVE_ROLE')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('REMOVE_ROLE')")
     @DeleteMapping("/users/{userId}/roles")
     public ResponseEntity<String> removeRolesFromUser(@PathVariable Long userId, @RequestBody RoleRequest roleRequest) {
         adminService.removeRolesFromUser(userId, roleRequest.getRoleNames());
         return ResponseEntity.ok("Roles removed successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('CREATE_ROLE')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('CREATE_ROLE')")
     @PostMapping("/roles/{roleId}/permissions")
     public ResponseEntity<String> assignPermissions(@PathVariable Long roleId, @RequestBody PermissionRequest request){
         adminService.assignPermissionsToRole(roleId, request.getPermissionNames());
         return ResponseEntity.ok("Permissions assigned successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('REMOVE_PERMISSION')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN') and hasAuthority('REMOVE_PERMISSION')")
     @DeleteMapping("/roles/{roleId}/permissions")
     public ResponseEntity<String> removePermissions(@PathVariable Long roleId, @RequestBody PermissionRequest request){
         adminService.removePermissionsFromRole(roleId, request.getPermissionNames());
@@ -116,5 +116,24 @@ public class AdminController {
         String feedback = request != null ? request.getFeedback() : null;
         projectService.rejectProject(projectId, adminUsername, feedback);
         return ResponseEntity.ok("Project rejected successfully");
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/roles")
+    public ResponseEntity<List<RoleDto>> getAllRoles() {
+        return ResponseEntity.ok(adminService.getAllRoles());
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/permissions")
+    public ResponseEntity<List<String>> getAllPermissions() {
+        return ResponseEntity.ok(adminService.getAllPermissions());
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/roles")
+    public ResponseEntity<String> createRole(@RequestBody CreateRole request) {
+        adminService.createRole(request.getName());
+        return ResponseEntity.ok("Role created successfully");
     }
 }

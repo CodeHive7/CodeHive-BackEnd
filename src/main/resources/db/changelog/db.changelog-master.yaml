@@ -99,26 +99,17 @@ databaseChangeLog:
             tableName: "roles"
             columns:
               - column:
-                  name: "id"
-                  valueNumeric: "1"
-              - column:
                   name: "name"
                   value: "USER"
         - insert:
             tableName: "roles"
             columns:
               - column:
-                  name: "id"
-                  valueNumeric: "2"
-              - column:
                   name: "name"
                   value: "ADMIN"
         - insert:
             tableName: "roles"
             columns:
-              - column:
-                  name: "id"
-                  valueNumeric: "3"
               - column:
                   name: "name"
                   value: "SUPER_ADMIN"

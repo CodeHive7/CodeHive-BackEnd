@@ -65,7 +65,7 @@ public class ProjectController {
         return ResponseEntity.ok("Project deleted successfully");
     }
 
-//    @PreAuthorize("hasAuthority('APPLY_FOR_POSITION')")
+    @PreAuthorize("hasAuthority('APPLY_FOR_POSITION')")
     @PostMapping("/{projectId}/positions/{positionId}/apply")
     public ResponseEntity<String> applyForPosition(@PathVariable Long projectId,
                                                    @PathVariable Long positionId,
@@ -112,6 +112,20 @@ public class ProjectController {
     public ResponseEntity<List<ProjectResponseDto>> getRejectedProjects() {
         List<ProjectResponseDto> projects = projectService.getRejectedProjects();
         return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/pending")
+    public ResponseEntity<List<ProjectResponseDto>> getPendingProjects() {
+        List<ProjectResponseDto> projects = projectService.getPendingProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long projectId) {
+        ProjectResponseDto project = projectService.getProjectById(projectId);
+        return ResponseEntity.ok(project);
     }
 
 }

@@ -281,7 +281,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectResponseDto> getAcceptedProjects() {
-        List<Project> acceptedProjects = projectRepository.findByStatus(ProjectStatus.ACCEPTED);
+        List<Project> acceptedProjects = projectRepository.findByStatusWithPositions(ProjectStatus.ACCEPTED);
         return acceptedProjects.stream()
                 .map(projectMapper::toDto)
                 .collect(Collectors.toList());
@@ -289,9 +289,35 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectResponseDto> getRejectedProjects() {
-        List<Project> rejectedProjects = projectRepository.findByStatus(ProjectStatus.REJECTED);
+        List<Project> rejectedProjects = projectRepository.findByStatusWithPositions(ProjectStatus.REJECTED);
         return rejectedProjects.stream()
                 .map(projectMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ProjectResponseDto> getPendingProjects() {
+        List<Project> pendingProjects = projectRepository.findByStatusWithPositions(ProjectStatus.PENDING);
+        return pendingProjects.stream()
+                .map(projectMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<ProjectResponseDto> getAllProjects() {
+        List<Project> projects = projectRepository.findAllWithPositions();
+        return projects.stream()
+                .map(projectMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ProjectResponseDto getProjectById(Long projectId) {
+        Project project = projectRepository.findByIdWithPositions(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return projectMapper.toDto(project);
+    }
+
+
 }

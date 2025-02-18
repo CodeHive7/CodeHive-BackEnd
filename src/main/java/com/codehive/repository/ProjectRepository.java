@@ -12,7 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project,Long> {
-    List<Project> findByStatus(ProjectStatus status);
+    @Query("""
+           SELECT p FROM Project p
+           LEFT JOIN FETCH p.positions
+           LEFT JOIN FETCH p.category
+           WHERE p.status = :status
+""")
+    List<Project> findByStatusWithPositions(@Param("status") ProjectStatus status);
+
     @Query("""
             SELECT p
             FROM Project p
@@ -25,7 +32,14 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
             SELECT p
             FROM Project p
             LEFT JOIN FETCH p.positions 
+            LEFT JOIN FETCH p.category
+            LEFT JOIN FETCH p.creator
             WHERE p.id = :projectId
 """)
     Optional<Project> findByIdWithPositions(@Param("projectId") Long projectId);
+
+    @Query("SELECT p FROM  Project p LEFT JOIN FETCH p.positions")
+    List<Project> findAllWithPositions();
+
+
 }

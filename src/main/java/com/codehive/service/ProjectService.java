@@ -17,6 +17,9 @@ public interface ProjectService {
     void rejectProject(Long projectId, String adminUsername, String feedback);
     List<ProjectResponseDto> getAcceptedProjects();
     List<ProjectResponseDto> getRejectedProjects();
+    List<ProjectResponseDto> getPendingProjects();
+    List<ProjectResponseDto> getAllProjects();
+    ProjectResponseDto getProjectById(Long projectId);
 
 
 }

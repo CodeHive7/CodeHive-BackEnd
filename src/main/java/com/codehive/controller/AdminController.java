@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestScope;
 
 import java.util.List;
 
@@ -88,9 +89,23 @@ public class AdminController {
         return ResponseEntity.ok("Category created successfully");
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PutMapping("/categories/{categoryId}")
+    public ResponseEntity<String> updateCategory(@PathVariable Long categoryId, @RequestBody CategoryRequest request) {
+        adminService.updateCategory(categoryId, request.getName());
+        return ResponseEntity.ok("Category updated successfully");
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
+        adminService.deleteCategory(categoryId);
+        return ResponseEntity.ok("Category deleted successfully");
+    }
+
     @GetMapping("/categories")
-    public ResponseEntity<List<String>> listCategories() {
-        List<String> categories = adminService.listCategories();
+    public ResponseEntity<List<CategoryDto>> listCategories() {
+        List<CategoryDto> categories = adminService.listCategories();
         return ResponseEntity.ok(categories);
     }
 
@@ -135,5 +150,25 @@ public class AdminController {
     public ResponseEntity<String> createRole(@RequestBody CreateRole request) {
         adminService.createRole(request.getName());
         return ResponseEntity.ok("Role created successfully");
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PutMapping("/roles/{roleId}")
+    public ResponseEntity<String> updateRole(@PathVariable Long roleId, @RequestBody CreateRole request) {
+        adminService.updateRole(roleId, request.getName());
+        return ResponseEntity.ok("Role updated successfully");
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/roles/{roleId}")
+    public ResponseEntity<String> deleteRole(@PathVariable Long roleId) {
+        adminService.deleteRole(roleId);
+        return ResponseEntity.ok("Role deleted successfully");
+    }
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/allProjects")
+    public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
+        List<ProjectResponseDto> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
     }
 }

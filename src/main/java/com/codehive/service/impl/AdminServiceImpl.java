@@ -1,5 +1,6 @@
 package com.codehive.service.impl;
 
+import com.codehive.dto.CategoryDto;
 import com.codehive.dto.CreateUserRequest;
 import com.codehive.dto.RoleDto;
 import com.codehive.dto.UserDto;
@@ -158,10 +159,25 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<String> listCategories() {
+    public List<CategoryDto> listCategories() {
         return categoryRepository.findAll().stream()
-                .map(Category::getName)
+                .map(category -> new CategoryDto(category.getId(), category.getName()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateCategory(Long categoryId, String newName) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setName(newName);
+        categoryRepository.save(category);
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        categoryRepository.delete(category);
     }
 
     @Override
@@ -198,5 +214,20 @@ public class AdminServiceImpl implements AdminService {
         Role newRole = new Role();
         newRole.setName(roleName);
         roleRepository.save(newRole);
+    }
+
+    @Override
+    public void updateRole(Long roleId, String newName) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        role.setName(newName);
+        roleRepository.save(role);
+    }
+
+    @Override
+    public void deleteRole(Long roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        roleRepository.delete(role);
     }
 }

@@ -47,4 +47,5 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProjectPosition> positions = new HashSet<>();
+
 }

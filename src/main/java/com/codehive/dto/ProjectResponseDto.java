@@ -22,5 +22,6 @@ public class ProjectResponseDto {
     private List<PositionResponseDto> positions;
     private String applicationStatus;
     private String feedback;
+    private String creatorName;
 
 }

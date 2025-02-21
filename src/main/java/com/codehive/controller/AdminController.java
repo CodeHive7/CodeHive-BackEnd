@@ -99,8 +99,12 @@ public class AdminController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-        adminService.deleteCategory(categoryId);
-        return ResponseEntity.ok("Category deleted successfully");
+        try {
+            adminService.deleteCategory(categoryId);
+            return ResponseEntity.ok("Category deleted successfully");
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @GetMapping("/categories")

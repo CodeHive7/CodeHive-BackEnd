@@ -1,6 +1,7 @@
 package com.codehive.repository;
 
 import com.codehive.Enum.ProjectStatus;
+import com.codehive.entity.Category;
 import com.codehive.entity.Project;
 import com.codehive.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,6 +41,8 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
 
     @Query("SELECT p FROM  Project p LEFT JOIN FETCH p.positions")
     List<Project> findAllWithPositions();
+
+    long countByCategory(Category category);
 
 
 }

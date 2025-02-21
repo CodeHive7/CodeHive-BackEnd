@@ -9,10 +9,7 @@ import com.codehive.entity.Permissions;
 import com.codehive.entity.Role;
 import com.codehive.entity.User;
 import com.codehive.mapper.UserMapper;
-import com.codehive.repository.CategoryRepository;
-import com.codehive.repository.PermissionsRepository;
-import com.codehive.repository.RoleRepository;
-import com.codehive.repository.UserRepository;
+import com.codehive.repository.*;
 import com.codehive.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +32,7 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     private final PermissionsRepository permissionsRepository;
     private final CategoryRepository categoryRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -177,6 +175,12 @@ public class AdminServiceImpl implements AdminService {
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+        //Check if category is assigned to any project
+        long projectCount = projectRepository.countByCategory(category);
+        if(projectCount > 0) {
+            throw new RuntimeException("Cannot delete category. It is currently is use");
+        }
+
         categoryRepository.delete(category);
     }
 

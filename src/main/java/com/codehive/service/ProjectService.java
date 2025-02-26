@@ -11,6 +11,7 @@ public interface ProjectService {
     void deleteProject(Long projectId, String username);
     void applyForPosition(Long projectId, Long positionId, String username, ApplyForPositionRequest request);
     List<ProjectResponseDto> getProjectsUserAppliedTo(String username);
+    List<ApplicantResponseDto> getApplicantsForUserProjects(String username);
     List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username);
     void updateApplicationStatus(String username , ApplicationUpdateRequest request);
     void acceptProject(Long projectId, String adminUsername);

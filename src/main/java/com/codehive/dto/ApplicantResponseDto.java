@@ -10,4 +10,5 @@ public class ApplicantResponseDto {
     private String applicantUsername;
     private String positionName;
     private String applicationStatus;
+    private String projectName;
 }

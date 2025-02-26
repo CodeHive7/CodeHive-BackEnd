@@ -14,6 +14,7 @@ import com.codehive.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -210,14 +211,32 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+    public List<ApplicantResponseDto> getApplicantsForUserProjects(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if(!project.getCreator().getUsername().equals(username)) {
-            throw new RuntimeException("You are not authorized to view applicantss for this project");
+        List<Project> projects = projectRepository.findByCreatorWithPositions(user);
+        List<ApplicantResponseDto> applicants = new ArrayList<>();
+
+        for (Project project : projects) {
+            List<PositionApplication> applications = applicationRepository.findByProject(project);
+            applications.forEach(application -> {
+                ApplicantResponseDto dto = applicantMapper.toDto(application);
+                dto.setProjectName(project.getName());
+                applicants.add(dto);
+            });
         }
 
+        return applicants;
+    }
+
+    @Override
+    public List<ApplicantResponseDto> getApplicantsForProject(Long projectId, String username) {
+        Project project = projectRepository.findByIdWithPositions(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        if(!project.getCreator().getUsername().equals(username)) {
+            throw new RuntimeException("You are not authorized to view applicants for this project");
+        }
         List<PositionApplication> applications = applicationRepository.findByProject(project);
 
         return applications.stream()

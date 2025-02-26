@@ -83,12 +83,13 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasAuthority('READ_PROJECT')")
-    @GetMapping("/{projectId}/applicants")
-    public ResponseEntity<List<ApplicantResponseDto>> getApplicantsForProject(@PathVariable Long projectId, @AuthenticationPrincipal User principal) {
+    @GetMapping("my-applicants")
+    public ResponseEntity<List<ApplicantResponseDto>> getApplicantsForMyProjects( @AuthenticationPrincipal User principal) {
         String username = principal.getUsername();
-        List<ApplicantResponseDto> applicants = projectService.getApplicantsForProject(projectId, username);
+        List<ApplicantResponseDto> applicants = projectService.getApplicantsForUserProjects(username);
         return ResponseEntity.ok(applicants);
     }
+
 
     @PreAuthorize("hasAuthority('UPDATE_APPLICATION_STATUS')")
     @PutMapping("/{projectId}/applications")

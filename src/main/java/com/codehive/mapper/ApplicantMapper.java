@@ -15,5 +15,6 @@ public interface ApplicantMapper {
     @Mapping(source = "applicant.username", target = "applicantUsername")
     @Mapping(source = "position.roleName", target = "positionName")
     @Mapping(source = "status", target = "applicationStatus")
+    @Mapping(source = "position.project.name", target = "projectName")
     ApplicantResponseDto toDto(PositionApplication application);
 }

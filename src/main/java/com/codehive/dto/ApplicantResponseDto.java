@@ -6,6 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ApplicantResponseDto {
+    private Long applicationId;
+    private Long projectId;
     private String applicantName;
     private String applicantUsername;
     private String positionName;

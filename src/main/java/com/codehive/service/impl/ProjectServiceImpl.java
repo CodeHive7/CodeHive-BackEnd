@@ -265,9 +265,12 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(request.isAccept()) {
                 application.setStatus(ApplicationStatus.ACCEPTED);
+                if (request.getFeedback() != null && !request.getFeedback().isEmpty()) {
+                    application.setFeedback(request.getFeedback());
+                }
             } else {
                 application.setStatus(ApplicationStatus.REJECTED);
-                application.setFeedback(request.getFeedback());
+                application.setFeedback(request.getFeedback() != null ? request.getFeedback(): "No specific reason provided.");
             }
         }
         applicationRepository.saveAll(applications);

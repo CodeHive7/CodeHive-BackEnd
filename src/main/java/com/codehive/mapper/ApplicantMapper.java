@@ -10,7 +10,8 @@ import org.mapstruct.factory.Mappers;
 public interface ApplicantMapper {
 
     ApplicantMapper INSTANCE = Mappers.getMapper(ApplicantMapper.class);
-
+    @Mapping(source = "id", target = "applicationId")
+    @Mapping(source = "position.project.id", target = "projectId")
     @Mapping(source = "applicant.fullName", target = "applicantName")
     @Mapping(source = "applicant.username", target = "applicantUsername")
     @Mapping(source = "position.roleName", target = "positionName")

@@ -37,4 +37,11 @@ public interface ApplicationRepository extends JpaRepository<PositionApplication
 
     boolean existsByApplicantAndPosition_ProjectAndStatus(User applicant, Project project , ApplicationStatus status);
 
+    @Query("""
+           SELECT pa FROM PositionApplication pa
+           JOIN pa.position pos
+           WHERE pos.project = :project AND pa.status = :status
+""")
+    List<PositionApplication> findByProjectAndStatus( @Param("project") Project project, @Param("status") ApplicationStatus status);
+
 }

@@ -21,6 +21,7 @@ public interface ProjectService {
     List<ProjectResponseDto> getPendingProjects();
     List<ProjectResponseDto> getAllProjects();
     ProjectResponseDto getProjectById(Long projectId);
+    List<AcceptedApplicantDto> getAcceptedApplicants(Long projectId , String username);
 
 
 }

@@ -129,4 +129,12 @@ public class ProjectController {
         return ResponseEntity.ok(project);
     }
 
+    @PreAuthorize("hasAnyAuthority('READ_PROJECT')")
+    @GetMapping("/{projectId}/accepted-applicants")
+    public ResponseEntity<List<AcceptedApplicantDto>> getAcceptedApplicants(@PathVariable Long projectId , @AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        List<AcceptedApplicantDto> acceptedApplicants = projectService.getAcceptedApplicants(projectId, username);
+        return ResponseEntity.ok(acceptedApplicants);
+    }
+
 }

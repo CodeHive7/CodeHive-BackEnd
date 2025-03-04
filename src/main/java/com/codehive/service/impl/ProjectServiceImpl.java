@@ -341,5 +341,24 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.toDto(project);
     }
 
+    @Override
+    public List<AcceptedApplicantDto> getAcceptedApplicants(Long projectId, String username) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        if(!project.getCreator().getUsername().equals(username)) {
+            throw new RuntimeException("You are not authorized to view applicants for this project");
+        }
+
+        List<PositionApplication> acceptedApplications = applicationRepository.findByProjectAndStatus(project, ApplicationStatus.ACCEPTED);
+
+        return acceptedApplications.stream().map(application -> {
+            User applicant = application.getApplicant();
+            return new AcceptedApplicantDto(
+                    applicant.getId(),
+                    applicant.getUsername()
+            );
+        }).collect(Collectors.toList());
+    }
+
 
 }

@@ -6,6 +6,7 @@ import com.codehive.dto.RoleDto;
 import com.codehive.dto.UserDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public interface AdminService {
@@ -28,4 +29,5 @@ public interface AdminService {
     void deleteRole(Long roleId);
     void updateCategory(Long categoryId, String newName);
     void deleteCategory(Long categoryId);
+    Map<String,Object> getDashboardStats();
 }

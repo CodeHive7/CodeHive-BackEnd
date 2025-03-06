@@ -16,9 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final PermissionsRepository permissionsRepository;
     private final CategoryRepository categoryRepository;
     private final ProjectRepository projectRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -182,6 +181,22 @@ public class AdminServiceImpl implements AdminService {
         }
 
         categoryRepository.delete(category);
+    }
+
+    @Override
+    public Map<String, Object> getDashboardStats() {
+        Map<String ,Object> stats = new HashMap<>();
+        long totalUsers = userRepository.count();
+        long activeProjects = projectRepository.countActiveProjects();
+        long totalApplicants = applicationRepository.countApplicants();
+        long pendingApplications = applicationRepository.countPendingApplications();
+
+        stats.put("totalUsers", totalUsers);
+        stats.put("activeProjects", activeProjects);
+        stats.put("totalApplicants", totalApplicants);
+        stats.put("pendingApplications", pendingApplications);
+
+        return stats;
     }
 
     @Override

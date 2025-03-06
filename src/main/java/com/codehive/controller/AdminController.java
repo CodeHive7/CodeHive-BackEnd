@@ -7,6 +7,7 @@ import com.codehive.service.AdminService;
 import com.codehive.service.ProjectService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestScope;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -174,5 +176,12 @@ public class AdminController {
     public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
         List<ProjectResponseDto> projects = projectService.getAllProjects();
         return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @GetMapping("/dashboard/stats")
+    public ResponseEntity<Map<String,Object>> getDashboardStats() {
+        Map<String , Object> stats = adminService.getDashboardStats();
+        return ResponseEntity.ok(stats);
     }
 }

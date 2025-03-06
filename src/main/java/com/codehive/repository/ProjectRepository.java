@@ -44,5 +44,8 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
 
     long countByCategory(Category category);
 
+    @Query("SELECT COUNT(p) FROM Project p WHERE p.status = 'ACCEPTED'")
+    long countActiveProjects();
+
 
 }

@@ -44,4 +44,12 @@ public interface ApplicationRepository extends JpaRepository<PositionApplication
 """)
     List<PositionApplication> findByProjectAndStatus( @Param("project") Project project, @Param("status") ApplicationStatus status);
 
+    @Query("SELECT COUNT(DISTINCT pa.applicant) FROM PositionApplication pa")
+    long countApplicants();
+
+    @Query("SELECT COUNT(pa) FROM PositionApplication pa WHERE pa.status = 'PENDING'")
+    long countPendingApplications();
+
+
+
 }

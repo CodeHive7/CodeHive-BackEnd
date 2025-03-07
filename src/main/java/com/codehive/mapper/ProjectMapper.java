@@ -17,14 +17,16 @@ public interface ProjectMapper {
             @Mapping(target = "creator", ignore = true),
             @Mapping(target = "positions", ignore = true),
             @Mapping(target = "stage", expression = "java( mapStage(dto.getStage()) )"),
-            @Mapping(target = "category", ignore = true)
+            @Mapping(target = "category", ignore = true),
     })
     Project toEntity(CreateProjectRequest dto);
 
     @Mappings({
             @Mapping(target = "stage", expression = "java( entity.getStage().name() )"),
             @Mapping(target = "positions", source = "positions"),
-            @Mapping(target = "category", source = "category.name")
+            @Mapping(target = "category", expression = "java(entity.getCategory() != null ? entity.getCategory().getName() : \"Uncategorized\")"),
+            @Mapping(target = "creatorName", expression = "java(entity.getCreator() != null ? entity.getCreator().getUsername() : \"Unknown\")") // ✅ Map creator name
+
     })
     ProjectResponseDto toDto(Project entity);
 

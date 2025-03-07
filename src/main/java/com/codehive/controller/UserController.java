@@ -35,4 +35,10 @@ public class UserController {
         UserDto userDto = userService.updateUserProfile(username, userVM);
         return ResponseEntity.ok(userDto);
     }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<UserDto> getUserProfileByUsername(@PathVariable String username) {
+        UserDto userDto = userService.getUserProfile(username);
+        return ResponseEntity.ok(userDto);
+    }
 }

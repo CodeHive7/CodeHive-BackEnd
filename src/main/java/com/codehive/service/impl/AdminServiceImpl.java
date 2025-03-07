@@ -1,24 +1,22 @@
 package com.codehive.service.impl;
 
+import com.codehive.dto.CategoryDto;
 import com.codehive.dto.CreateUserRequest;
+import com.codehive.dto.RoleDto;
 import com.codehive.dto.UserDto;
 import com.codehive.entity.Category;
 import com.codehive.entity.Permissions;
 import com.codehive.entity.Role;
 import com.codehive.entity.User;
 import com.codehive.mapper.UserMapper;
-import com.codehive.repository.CategoryRepository;
-import com.codehive.repository.PermissionsRepository;
-import com.codehive.repository.RoleRepository;
-import com.codehive.repository.UserRepository;
+import com.codehive.repository.*;
 import com.codehive.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,12 +30,25 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     private final PermissionsRepository permissionsRepository;
     private final CategoryRepository categoryRepository;
+    private final ProjectRepository projectRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(userMapper::toDto)
+                .map(user -> {
+                    UserDto dto = new UserDto();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    dto.setEmail(user.getEmail());
+                    Set<String> roleNames = user.getRoles().stream()
+                            .map(Role::getName)
+                            .collect(Collectors.toSet());
+                    dto.setRoles(roleNames);
+                    dto.setStatus(user.isActive() ? "Active": "Banned");
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -145,9 +156,97 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<String> listCategories() {
+    public List<CategoryDto> listCategories() {
         return categoryRepository.findAll().stream()
-                .map(Category::getName)
+                .map(category -> new CategoryDto(category.getId(), category.getName()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateCategory(Long categoryId, String newName) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setName(newName);
+        categoryRepository.save(category);
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        //Check if category is assigned to any project
+        long projectCount = projectRepository.countByCategory(category);
+        if(projectCount > 0) {
+            throw new RuntimeException("Cannot delete category. It is currently is use");
+        }
+
+        categoryRepository.delete(category);
+    }
+
+    @Override
+    public Map<String, Object> getDashboardStats() {
+        Map<String ,Object> stats = new HashMap<>();
+        long totalUsers = userRepository.count();
+        long activeProjects = projectRepository.countActiveProjects();
+        long totalApplicants = applicationRepository.countApplicants();
+        long pendingApplications = applicationRepository.countPendingApplications();
+
+        stats.put("totalUsers", totalUsers);
+        stats.put("activeProjects", activeProjects);
+        stats.put("totalApplicants", totalApplicants);
+        stats.put("pendingApplications", pendingApplications);
+
+        return stats;
+    }
+
+    @Override
+    public void assignPermissionsToUser(Long userId, List<String> permissionNames) {
+
+    }
+
+    @Override
+    public void removePermissionsFromUser(Long userId, List<String> permissionNames) {
+
+    }
+
+    @Override
+    public List<RoleDto> getAllRoles() {
+        return roleRepository.findAll()
+                .stream()
+                .map(role -> new RoleDto(role.getId(), role.getName(), role.getPermissions()
+                        .stream().map(Permissions::getName).collect(Collectors.toList())))
+                .toList();
+    }
+
+    @Override
+    public List<String> getAllPermissions() {
+        return permissionsRepository.findAll().stream()
+                .map(Permissions::getName)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void createRole(String roleName) {
+        if (roleRepository.findByName(roleName).isPresent()){
+            throw new RuntimeException("Role already exists");
+        }
+        Role newRole = new Role();
+        newRole.setName(roleName);
+        roleRepository.save(newRole);
+    }
+
+    @Override
+    public void updateRole(Long roleId, String newName) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        role.setName(newName);
+        roleRepository.save(role);
+    }
+
+    @Override
+    public void deleteRole(Long roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        roleRepository.delete(role);
     }
 }

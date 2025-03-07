@@ -1,8 +1,6 @@
 package com.codehive.controller;
 
-import com.codehive.dto.ApplyForPositionRequest;
-import com.codehive.dto.CreateProjectRequest;
-import com.codehive.dto.ProjectResponseDto;
+import com.codehive.dto.*;
 import com.codehive.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +37,14 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/applied-projects")
+    public ResponseEntity<List<ProjectResponseDto>> getProjectsUserAppliedTo(@AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        List<ProjectResponseDto> projects = projectService.getProjectsUserAppliedTo(username);
+        return ResponseEntity.ok(projects);
+    }
+
     @PreAuthorize("hasAuthority('UPDATE_PROJECT')")
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto> updateProject(
@@ -59,7 +65,7 @@ public class ProjectController {
         return ResponseEntity.ok("Project deleted successfully");
     }
 
-//    @PreAuthorize("hasAuthority('APPLY_FOR_POSITION')")
+    @PreAuthorize("hasAuthority('APPLY_FOR_POSITION')")
     @PostMapping("/{projectId}/positions/{positionId}/apply")
     public ResponseEntity<String> applyForPosition(@PathVariable Long projectId,
                                                    @PathVariable Long positionId,
@@ -76,5 +82,59 @@ public class ProjectController {
 
     }
 
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("my-applicants")
+    public ResponseEntity<List<ApplicantResponseDto>> getApplicantsForMyProjects( @AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        List<ApplicantResponseDto> applicants = projectService.getApplicantsForUserProjects(username);
+        return ResponseEntity.ok(applicants);
+    }
+
+
+    @PreAuthorize("hasAuthority('UPDATE_APPLICATION_STATUS')")
+    @PutMapping("/{projectId}/applications")
+    public ResponseEntity<String> updateApplications(@PathVariable Long projectId,
+                                                     @RequestBody ApplicationUpdateRequest request,
+                                                     @AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        projectService.updateApplicationStatus(username, request);
+        return ResponseEntity.ok("Application updated successfully");
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/accepted")
+    public ResponseEntity<List<ProjectResponseDto>> getAcceptedProjects() {
+        List<ProjectResponseDto> projects = projectService.getAcceptedProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/rejected")
+    public ResponseEntity<List<ProjectResponseDto>> getRejectedProjects() {
+        List<ProjectResponseDto> projects = projectService.getRejectedProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/pending")
+    public ResponseEntity<List<ProjectResponseDto>> getPendingProjects() {
+        List<ProjectResponseDto> projects = projectService.getPendingProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @PreAuthorize("hasAuthority('READ_PROJECT')")
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long projectId) {
+        ProjectResponseDto project = projectService.getProjectById(projectId);
+        return ResponseEntity.ok(project);
+    }
+
+    @PreAuthorize("hasAnyAuthority('READ_PROJECT')")
+    @GetMapping("/{projectId}/accepted-applicants")
+    public ResponseEntity<List<AcceptedApplicantDto>> getAcceptedApplicants(@PathVariable Long projectId , @AuthenticationPrincipal User principal) {
+        String username = principal.getUsername();
+        List<AcceptedApplicantDto> acceptedApplicants = projectService.getAcceptedApplicants(projectId, username);
+        return ResponseEntity.ok(acceptedApplicants);
+    }
 
 }

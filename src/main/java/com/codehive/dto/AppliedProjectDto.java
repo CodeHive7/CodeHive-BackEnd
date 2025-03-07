@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProjectResponseDto {
+public class AppliedProjectDto {
     private Long id;
     private String name;
     private String description;
@@ -20,8 +20,7 @@ public class ProjectResponseDto {
     private String question2;
     private ProjectStatus status;
     private List<PositionResponseDto> positions;
+
     private String applicationStatus;
     private String feedback;
-    private String creatorName;
-
 }

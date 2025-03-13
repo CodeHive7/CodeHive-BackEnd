@@ -4,6 +4,7 @@ import com.codehive.dto.LoginRequest;
 import com.codehive.dto.RegisterRequest;
 import com.codehive.dto.TokenBody;
 import com.codehive.dto.TokenResponse;
+import com.codehive.exception.BadRequestException;
 import com.codehive.security.JwtTokenProvider;
 import com.codehive.service.AuthService;
 import com.codehive.service.RefreshTokenService;
@@ -49,6 +50,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@RequestBody Map<String,String> request) {
         String refreshToken = request.get("refreshToken");
+
+        // This will explicitly throw NullPointerException when refreshToken is null
+        if (refreshToken == null) {
+            throw new BadRequestException("Refresh token is required");
+        }
 
         var optional = refreshTokenService.findByToken(refreshToken);
         if(optional.isEmpty()) {

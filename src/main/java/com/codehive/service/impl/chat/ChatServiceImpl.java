@@ -1,9 +1,11 @@
 package com.codehive.service.impl.chat;
 
+import com.codehive.Enum.ApplicationStatus;
 import com.codehive.dto.chat.ChatMessageDto;
 import com.codehive.entity.Project;
 import com.codehive.entity.User;
 import com.codehive.entity.chat.ChatMessage;
+import com.codehive.repository.ApplicationRepository;
 import com.codehive.repository.ProjectRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.repository.chat.ChatMessageRepository;
@@ -22,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     @Transactional
@@ -32,6 +35,18 @@ public class ChatServiceImpl implements ChatService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
+        // Check if the user is the project creator
+        boolean isCreator = project.getCreator().getId().equals(sender.getId());
+        // Check if the user has an accepted application for this project
+        boolean hasAcceptedPosition = false;
+        if(!isCreator) {
+            hasAcceptedPosition = applicationRepository.existsByApplicantAndPosition_ProjectAndStatus(
+                    sender, project, ApplicationStatus.ACCEPTED);
+        }
+        // only allow sending messages if user is creator or has accepted position
+        if(!isCreator && !hasAcceptedPosition) {
+            throw new RuntimeException("User is not authorized to send messages in this project");
+        }
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setContent(content);
         chatMessage.setSender(sender);

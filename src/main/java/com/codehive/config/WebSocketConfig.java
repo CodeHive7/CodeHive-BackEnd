@@ -41,7 +41,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public org.springframework.web.servlet.config.annotation.WebMvcConfigurer corsCofigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {

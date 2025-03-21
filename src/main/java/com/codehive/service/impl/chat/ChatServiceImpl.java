@@ -40,14 +40,18 @@ public class ChatServiceImpl implements ChatService {
         boolean isCreator = project.getCreator().getId().equals(sender.getId());
         // Check if the user has an accepted application for this project
         boolean hasAcceptedPosition = false;
-        if(!isCreator) {
+        if (!isCreator) {
             hasAcceptedPosition = applicationRepository.existsByApplicantAndPosition_ProjectAndStatus(
                     sender, project, ApplicationStatus.ACCEPTED);
         }
-        // only allow sending messages if user is creator or has accepted position
-        if(!isCreator && !hasAcceptedPosition) {
+
+        System.out.println("DEBUG: In sendMessage - User " + username + " isCreator: " + isCreator);
+        System.out.println("DEBUG: In sendMessage - User " + username + " hasAcceptedPosition: " + hasAcceptedPosition);
+
+        if (!isCreator && !hasAcceptedPosition) {
             throw new RuntimeException("User is not authorized to send messages in this project");
         }
+
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setContent(content);
         chatMessage.setSender(sender);
@@ -55,6 +59,9 @@ public class ChatServiceImpl implements ChatService {
         chatMessage.setTimestamp(LocalDateTime.now());
 
         ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
+        System.out.println("DEBUG: Message saved with ID " + savedMessage.getId() +
+                ", content: " + savedMessage.getContent() +
+                ", timestamp: " + savedMessage.getTimestamp());
 
         return mapToDto(savedMessage);
     }
@@ -75,16 +82,26 @@ public class ChatServiceImpl implements ChatService {
                     user, project, ApplicationStatus.ACCEPTED);
         }
 
-        // Only allow viewing messages if user is creator or has accepted position
+        System.out.println("DEBUG: User " + username + " isCreator: " + isCreator);
+        System.out.println("DEBUG: User " + username + " hasAcceptedPosition: " + hasAcceptedPosition);
+
         if (!isCreator && !hasAcceptedPosition) {
+            System.out.println("DEBUG: User " + username + " is NOT authorized to view messages for project " + projectId);
             return List.of();
         }
-        // Add logging to debug message retrieval
-        List<ChatMessage> messages = chatMessageRepository.findByProjectIdOrderByTimestampAsc(projectId);
 
-        return messages.stream()
+        List<ChatMessage> messages = chatMessageRepository.findByProjectIdOrderByTimestampAsc(projectId);
+        System.out.println("DEBUG: Found " + messages.size() + " chat messages for project " + projectId);
+        for (ChatMessage msg : messages) {
+            System.out.println("DEBUG: Message ID " + msg.getId() + ", content: " + msg.getContent() +
+                    ", timestamp: " + msg.getTimestamp());
+        }
+
+        List<ChatMessageDto> dtos = messages.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+        System.out.println("DEBUG: Converted messages to DTOs: " + dtos);
+        return dtos;
     }
 
     @Override
@@ -95,7 +112,6 @@ public class ChatServiceImpl implements ChatService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
             Project project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new RuntimeException("Project not found"));
-
             return true;
         } catch (Exception e) {
             return false;

@@ -48,10 +48,8 @@ public class WebSocketAuthenticationConfig implements WebSocketMessageBrokerConf
                                 // Pass false to indicate this is NOT a refresh token
                                 String username = jwtTokenProvider.getUsernameFromToken(token, false);
                                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                                Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                        userDetails, null, userDetails.getAuthorities());
-
+                                UsernamePasswordAuthenticationToken authentication =
+                                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                                 SecurityContextHolder.getContext().setAuthentication(authentication);
                                 accessor.setUser(authentication);
                                 System.out.println("WebSocket authenticated user: " + username); // Debug log

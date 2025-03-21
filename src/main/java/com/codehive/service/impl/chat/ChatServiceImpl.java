@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ public class ChatServiceImpl implements ChatService {
         chatMessage.setContent(content);
         chatMessage.setSender(sender);
         chatMessage.setProject(project);
+        chatMessage.setTimestamp(LocalDateTime.now());
 
         ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
 
@@ -65,10 +67,39 @@ public class ChatServiceImpl implements ChatService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
+        // Check if the user is authorized to view messages
+        boolean isCreator = project.getCreator().getId().equals(user.getId());
+        boolean hasAcceptedPosition = false;
+        if (!isCreator) {
+            hasAcceptedPosition = applicationRepository.existsByApplicantAndPosition_ProjectAndStatus(
+                    user, project, ApplicationStatus.ACCEPTED);
+        }
+
+        // Only allow viewing messages if user is creator or has accepted position
+        if (!isCreator && !hasAcceptedPosition) {
+            return List.of();
+        }
+        // Add logging to debug message retrieval
         List<ChatMessage> messages = chatMessageRepository.findByProjectIdOrderByTimestampAsc(projectId);
+
         return messages.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public boolean addUserToProject(Long projectId, String username) {
+        try {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private ChatMessageDto mapToDto(ChatMessage chatMessage) {

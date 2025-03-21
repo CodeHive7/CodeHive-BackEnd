@@ -42,7 +42,7 @@ public class ChatWebSocketController {
             messagingTemplate.convertAndSendToUser(username, "/queue/messages", messages);
         } catch (Exception e) {
             log.error("Error in fetchMessages:", e);
-            throw e;
+            messagingTemplate.convertAndSendToUser(authentication.getName(), "/queue/messages", List.of());
         }
     }
 

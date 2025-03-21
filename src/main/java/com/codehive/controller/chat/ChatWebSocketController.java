@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -54,6 +55,7 @@ public class ChatWebSocketController {
             ChatMessageDto joinMessage = new ChatMessageDto();
             joinMessage.setSenderUsername(username);
             joinMessage.setContent(username + " joined the conversation");
+            joinMessage.setTimestamp(LocalDateTime.now());
             joinMessage.setProjectId(request.getProjectId());
             messagingTemplate.convertAndSend("/topic/project/" + request.getProjectId(), joinMessage);
         } catch (Exception e) {

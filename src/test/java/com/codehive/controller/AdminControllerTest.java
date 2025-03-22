@@ -212,8 +212,8 @@ class AdminControllerTest {
     @Test
     void listCategories_ShouldReturnCategoryList() {
         List<CategoryDto> mockCategories = Arrays.asList(
-            new CategoryDto(1L, "Category 1"),
-            new CategoryDto(2L, "Category 2")
+                new CategoryDto(1L, "Category 1"),
+                new CategoryDto(2L, "Category 2")
         );
         when(adminService.listCategories()).thenReturn(mockCategories);
 
@@ -350,8 +350,8 @@ class AdminControllerTest {
     @Test
     void getAllProjects_ShouldReturnProjectsList() {
         List<ProjectResponseDto> mockProjects = Arrays.asList(
-            new ProjectResponseDto(),
-            new ProjectResponseDto()
+                new ProjectResponseDto(),
+                new ProjectResponseDto()
         );
         when(projectService.getAllProjects()).thenReturn(mockProjects);
 

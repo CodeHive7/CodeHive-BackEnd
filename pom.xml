@@ -126,6 +126,12 @@
 			<version>${mapstruct.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- H2 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
 
 	<build>

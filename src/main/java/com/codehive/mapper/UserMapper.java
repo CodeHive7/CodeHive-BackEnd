@@ -114,7 +114,7 @@ public class UserMapper {
         }
     }
 
-    private EducationDto toEducationDto(Education education) {
+    public EducationDto toEducationDto(Education education) {
         EducationDto dto = new EducationDto();
         dto.setId(education.getId());
         dto.setInstitution(education.getInstitution());
@@ -127,7 +127,7 @@ public class UserMapper {
         return dto;
     }
 
-    private ExperienceDto toExperienceDto(Experience experience) {
+    public ExperienceDto toExperienceDto(Experience experience) {
         ExperienceDto dto = new ExperienceDto();
         dto.setId(experience.getId());
         dto.setTitle(experience.getTitle());
@@ -141,7 +141,7 @@ public class UserMapper {
         return dto;
     }
 
-    private Education toEducationEntity(EducationDto dto) {
+    public Education toEducationEntity(EducationDto dto) {
         Education education = new Education();
         education.setId(dto.getId());
         education.setInstitution(dto.getInstitution());
@@ -154,7 +154,7 @@ public class UserMapper {
         return education;
     }
 
-    private Experience toExperienceEntity(ExperienceDto dto) {
+    public Experience toExperienceEntity(ExperienceDto dto) {
         Experience experience = new Experience();
         experience.setId(dto.getId());
         experience.setTitle(dto.getTitle());

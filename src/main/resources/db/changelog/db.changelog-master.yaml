@@ -897,11 +897,6 @@ databaseChangeLog:
                   type: "BIGINT"
                   constraints:
                     nullable: false
-              - column:
-                  name: "proficiency_level"
-                  type: "VARCHAR(50)"
-                  constraints:
-                    nullable: true
         - addPrimaryKey:
             tableName: "user_skills"
             columnNames: "user_id, skill_id"

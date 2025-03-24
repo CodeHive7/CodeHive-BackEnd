@@ -100,7 +100,7 @@ public class UserMapper {
         }
 
         // Update skills if provided
-        if(userVM.getSkills() != null) {
+        if(userVM.getSkills() != null && !userVM.getSkills().isEmpty()) {
             user.getSkills().clear();
             userVM.getSkills().forEach(skillDto -> {
                 Skill skill = skillRepository.findByName(skillDto.getName())

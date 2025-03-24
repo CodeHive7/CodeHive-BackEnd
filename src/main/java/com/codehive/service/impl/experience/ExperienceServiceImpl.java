@@ -33,6 +33,8 @@ public class ExperienceServiceImpl implements ExperienceService {
         experience.setUser(user);
 
         Experience savedExperience = experienceRepository.save(experience);
+        experienceRepository.flush();
+
         return userMapper.toExperienceDto(savedExperience);
     }
 

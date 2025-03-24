@@ -26,12 +26,12 @@ public class SkillController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<Void> addSkillToUser(
+    public ResponseEntity<SkillDto> addSkillToUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody SkillDto skillDto) {
         String username = userDetails.getUsername();
-        skillService.addSkillToUser(username, skillDto.getName());
-        return ResponseEntity.ok().build();
+        SkillDto addedSkill = skillService.addSkillToUser(username, skillDto.getName());
+        return ResponseEntity.ok(addedSkill);
     }
 
     @DeleteMapping("/user/{skillId}")

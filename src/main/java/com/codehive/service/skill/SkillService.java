@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface SkillService {
     SkillDto createSkill(String skillName);
-    void addSkillToUser(String username, String skillName);
+    SkillDto addSkillToUser(String username, String skillName);
     void removeSkillFromUser(String username, Long skillId);
     Set<SkillDto> getUserSkills(String username);
     List<SkillDto> getAllSkills();

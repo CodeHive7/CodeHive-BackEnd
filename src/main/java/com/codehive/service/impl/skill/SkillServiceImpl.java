@@ -45,7 +45,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     @Transactional
-    public void addSkillToUser(String username, String skillName) {
+    public SkillDto addSkillToUser(String username, String skillName) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -57,7 +57,14 @@ public class SkillServiceImpl implements SkillService {
                 });
 
         user.getSkills().add(skill);
-        userRepository.save(user);
+        skill.getUsers().add(user);
+
+        userRepository.saveAndFlush(user);
+
+        SkillDto skillDto = new SkillDto();
+        skillDto.setId(skill.getId());
+        skillDto.setName(skill.getName());
+        return skillDto;
     }
 
     @Override

@@ -8,16 +8,17 @@ import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Profile("!test")
 @Component
+@Order(1)
 @RequiredArgsConstructor
 public class DefaultAdmin implements CommandLineRunner {
     private final UserRepository userRepository;
@@ -33,6 +34,7 @@ public class DefaultAdmin implements CommandLineRunner {
 
     @Value("${app.default-admin.email}")
     private String email;
+
 
     @Override
     @Transactional

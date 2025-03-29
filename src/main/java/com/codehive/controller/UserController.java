@@ -41,4 +41,5 @@ public class UserController {
         UserDto userDto = userService.getUserProfile(username);
         return ResponseEntity.ok(userDto);
     }
+
 }

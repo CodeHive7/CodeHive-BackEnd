@@ -37,6 +37,8 @@ public class User {
     private boolean isActive = true;
     @Column(name = "bio")
     private String bio;
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

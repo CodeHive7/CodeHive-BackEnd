@@ -5,23 +5,30 @@ import com.codehive.dto.RegisterRequest;
 import com.codehive.dto.TokenResponse;
 import com.codehive.entity.Role;
 import com.codehive.entity.User;
+import com.codehive.entity.verificationToken.VerificationToken;
 import com.codehive.repository.RoleRepository;
 import com.codehive.repository.UserRepository;
 import com.codehive.security.JwtTokenProvider;
 import com.codehive.service.AuthService;
 import com.codehive.service.RefreshTokenService;
+import com.codehive.service.email.EmailService;
+import com.codehive.service.verificationToken.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -33,6 +40,11 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final VerificationTokenService verificationTokenService;
+    private final EmailService emailService;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
 
     @Override
@@ -41,17 +53,32 @@ public class AuthServiceImpl implements AuthService {
              throw new RuntimeException("Username already exists");
         }
 
+        if(userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setFullName(registerRequest.getFullName());
         user.setEmail(registerRequest.getEmail());
+        user.setEmailVerified(false);
 
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Role is not found"));
 
         user.getRoles().add(userRole);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Generate and send Verification email
+        try {
+            String token = verificationTokenService.generateToken(savedUser);
+            String verificationUrl = baseUrl + "/api/auth/verify-email?token=" + token;
+            emailService.sendVerificationEmail(savedUser, verificationUrl);
+        } catch (Exception e) {
+            userRepository.delete(savedUser);
+            log.error("Error sending verification email: {}", e.getMessage());
+        }
         return "User registered successfully";
     }
 
@@ -83,6 +110,10 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("User is blocked");
         }
 
+        if(!user.isEmailVerified()) {
+            throw new RuntimeException("Pleas verify your email before logging in");
+        }
+
         String accessToken = jwtTokenProvider.generateAccessToken(authentication.getName());
         String refreshToken = jwtTokenProvider.generateRefreshToken(authentication.getName());
 
@@ -93,6 +124,39 @@ public class AuthServiceImpl implements AuthService {
         );
 
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmail(String token) {
+        VerificationToken verificationToken = verificationTokenService.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+
+        if(verificationToken.isExpired()) {
+            verificationTokenService.deleteToken(verificationToken);
+            throw new RuntimeException("Verification Token has expired");
+        }
+
+        User user = verificationToken.getUser();
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        // Delete the used token
+        verificationTokenService.deleteToken(verificationToken);
+    }
+
+    @Override
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(user.isEmailVerified()) {
+            throw new RuntimeException("Email is already verified");
+        }
+
+        String token = verificationTokenService.generateToken(user);
+        String verificationUrl = baseUrl + "/api/auth/verify-email?token=" + token;
+        emailService.sendVerificationEmail(user, verificationUrl);
     }
 
 }

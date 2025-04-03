@@ -55,6 +55,7 @@ public class DefaultAdmin implements CommandLineRunner {
             admin.setEmail(email);
             admin.setPassword(passwordEncoder.encode(password));
             admin.setActive(true);
+            admin.setEmailVerified(true);
         } else {
             admin = optionalUser.get();
         }

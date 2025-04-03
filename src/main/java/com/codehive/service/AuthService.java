@@ -12,4 +12,6 @@ public interface AuthService {
     Optional<User> findByUsername(String username);
     String authenticate(LoginRequest loginRequest);
     TokenResponse login(LoginRequest loginRequest);
+    void verifyEmail(String token);
+    void resendVerificationEmail(String email);
 }

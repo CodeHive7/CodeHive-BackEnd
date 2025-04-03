@@ -22,16 +22,21 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendVerificationEmail(User user, String verificationUrl) {
+    public void sendVerificationEmail(User user, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(user.getEmail());
         message.setSubject("CodeHive - Verify your email");
-        message.setText("Hello " + user.getFullName() + ",\n\n" +
-                "Please verify your email address by clicking the link below:\n" +
-                verificationUrl + "\n\n" +
-                "This link will expire in 24 hours.\n\n" +
-                "Thanks,\nThe CodeHive Team");
+        String verificationUrl = baseUrl + "/verify-email?token=" + token;
+        message.setText(
+                "Hello " + user.getFullName() + ",\n\n" +
+                        "Welcome to CodeHive! 🐝\n\n" +
+                        "Please verify your email address by clicking the link below:\n" +
+                        verificationUrl + "\n\n" +
+                        "This link will expire in 24 hours.\n\n" +
+                        "Once verified, you'll be able to log in and start collaborating on amazing projects.\n\n" +
+                        "Thanks,\nThe CodeHive Team"
+        );
 
         mailSender.send(message);
     }

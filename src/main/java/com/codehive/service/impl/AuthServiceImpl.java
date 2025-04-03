@@ -73,8 +73,7 @@ public class AuthServiceImpl implements AuthService {
         // Generate and send Verification email
         try {
             String token = verificationTokenService.generateToken(savedUser);
-            String verificationUrl = baseUrl + "/api/auth/verify-email?token=" + token;
-            emailService.sendVerificationEmail(savedUser, verificationUrl);
+            emailService.sendVerificationEmail(savedUser, token);
         } catch (Exception e) {
             userRepository.delete(savedUser);
             log.error("Error sending verification email: {}", e.getMessage());
@@ -129,8 +128,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void verifyEmail(String token) {
-        VerificationToken verificationToken = verificationTokenService.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+        Optional<VerificationToken> optToken = verificationTokenService.findByToken(token);
+
+        if (optToken.isEmpty()) {
+            System.out.println("❌ Token not found in database: " + token);
+            throw new RuntimeException("Invalid verification token");
+        }
+
+        VerificationToken verificationToken = optToken.get();
+        System.out.println("✅ Found token for user: " + verificationToken.getUser().getUsername());
+
 
         if(verificationToken.isExpired()) {
             verificationTokenService.deleteToken(verificationToken);
@@ -138,11 +145,18 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = verificationToken.getUser();
+        if(user.isEmailVerified()) {
+            return;
+        }
         user.setEmailVerified(true);
         userRepository.save(user);
 
         // Delete the used token
-        verificationTokenService.deleteToken(verificationToken);
+        try {
+            verificationTokenService.deleteToken(verificationToken);
+        } catch (Exception e) {
+            log.error("Error deleting verification token: {}", e.getMessage());
+        }
     }
 
     @Override
@@ -155,8 +169,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = verificationTokenService.generateToken(user);
-        String verificationUrl = baseUrl + "/api/auth/verify-email?token=" + token;
-        emailService.sendVerificationEmail(user, verificationUrl);
+        emailService.sendVerificationEmail(user, token);
     }
 
 }

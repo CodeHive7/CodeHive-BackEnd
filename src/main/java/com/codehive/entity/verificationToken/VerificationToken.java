@@ -8,8 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "verification_tokens")
+@Entity(name = "verification_tokens")
 @Getter
 @Setter
 @NoArgsConstructor

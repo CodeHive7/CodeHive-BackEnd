@@ -1084,3 +1084,15 @@ databaseChangeLog:
             tableName: "verification_tokens"
             columnNames: "token"
             constraintName: "uk_verification_token"
+  - changeSet:
+      id: 32
+      author: "SimoAcharouaou777"
+      changes:
+        - addColumn:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "github_id"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: true

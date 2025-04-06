@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUsernameWithRolesAndPermissions(@Param("username") String username);
 
     boolean existsByEmail(String email);
+
+    Optional<User> findByGithubId(String githubId);
 }

@@ -47,7 +47,7 @@ public class SecurityConfig {
                 csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register", "/api/auth/verify-email","/api/auth/verify-email/**", "/api/auth/resend-verification").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register", "/api/auth/verify-email","/api/auth/verify-email/**", "/api/auth/resend-verification", "/api/auth/github/login","/api/auth/github/callback").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

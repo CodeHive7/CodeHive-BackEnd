@@ -39,6 +39,8 @@ public class User {
     private String bio;
     @Column(name = "email_verified")
     private boolean emailVerified = false;
+    @Column(name = "github_id")
+    private String githubId;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

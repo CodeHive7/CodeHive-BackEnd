@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,10 +44,9 @@ public class GitHubAuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/callback")
-    public ResponseEntity<TokenResponse> processGitHubCallback(@RequestBody Map<String, String> request) {
-        String code = request.get("code");
-        if (code == null) {
+    @GetMapping("/callback")
+    public ResponseEntity<TokenResponse> processGitHubCallback(@RequestParam("code") String code) {
+        if (code == null || code.isEmpty()) {
             throw new BadRequestException("No code provided");
         }
 
@@ -53,7 +54,6 @@ public class GitHubAuthController {
 
             String token = exchangeCodeForToken(code);
             System.out.println("Token received:" + token.substring(0, Math.min(10, token.length())) + "...");
-            System.out.println("Token type: " + (token.startsWith("gho_") ? "GitHub OAuth token" : "Other token type"));
 
             // Fetch GitHub user info
             Map<String, Object> userInfo = fetchGitHubUserInfo(token);
@@ -61,10 +61,9 @@ public class GitHubAuthController {
 
             // Process user info
             User user = gitHubUserService.processGitHubUser(userInfo);
-            System.out.println("Processed user: " + user.getUsername() + ", ID: " + user.getId());
-
             // Generate JWT tokens
             TokenResponse tokens = gitHubUserService.generateTokens(user);
+
             return ResponseEntity.ok(tokens);
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,33 +75,28 @@ public class GitHubAuthController {
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.set("Accept", "application/json");
 
-            Map<String, String> requestBody = new HashMap<>();
-            requestBody.put("client_id", clientId);
-            requestBody.put("client_secret", clientSecret);
-            requestBody.put("code", code);
-            requestBody.put("redirect_uri", frontendUrl + "/auth/github/callback");
+            MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+            requestBody.add("client_id", clientId);
+            requestBody.add("client_secret", clientSecret);
+            requestBody.add("code", code);
+            requestBody.add("redirect_uri", frontendUrl + "/auth/github/callback");
 
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<Map> response = restTemplate.postForEntity(
                     "https://github.com/login/oauth/access_token",
-                    request,
+                    requestEntity,
                     Map.class
             );
 
-            System.out.println("GitHub token response: " + response.getBody());
-
             if (response.getBody() == null || !response.getBody().containsKey("access_token")) {
-                throw new BadRequestException("Failed to obtain access token: " +
-                        (response.getBody() != null ? response.getBody().toString() : "null response"));
+                throw new BadRequestException("Failed to obtain access token: " + (response.getBody() != null ? response.getBody().toString() : "null response"));
             }
 
-            String accessToken = (String) response.getBody().get("access_token");
-            System.out.println("Access token extracted: " + accessToken.substring(0, 5) + "...");
-            return accessToken;
+            return (String) response.getBody().get("access_token");
         } catch (Exception e) {
             throw new BadRequestException("GitHub token exchange failed: " + e.getMessage());
         }

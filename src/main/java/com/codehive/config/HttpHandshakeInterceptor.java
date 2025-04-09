@@ -18,10 +18,20 @@ public class HttpHandshakeInterceptor implements HandshakeInterceptor {
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
             // Extract token from URL parameter
             String token = httpServletRequest.getParameter("token");
+
+            if((token == null || token.isEmpty()) && httpServletRequest.getHeader("Authorization") != null) {
+                String authHeader = httpServletRequest.getHeader("Authorization");
+                if (authHeader.startsWith("Bearer ")) {
+                    token = authHeader.substring(7);
+                }
+            }
+
             if (token != null && !token.isEmpty()) {
                 attributes.put("token", token);
+                return true;
             }
         }
+        System.out.println("WebSocket handshake rejected - no valid token found");
         return true;
     }
 

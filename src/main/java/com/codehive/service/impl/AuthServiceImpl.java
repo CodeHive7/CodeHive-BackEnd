@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
              throw new RuntimeException("Username already exists");
         }
 
-        if(userRepository.existsByEmail(registerRequest.getEmail())) {
+        if(userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
 
@@ -88,23 +88,33 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String authenticate(LoginRequest loginRequest) {
+        String loginCredentials = determineLoginCredential(loginRequest);
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(loginCredentials , loginRequest.getPassword())
         );
         return jwtTokenProvider.generateAccessToken(authentication.getName());
     }
 
     @Override
     public TokenResponse login(LoginRequest loginRequest) {
+        String loginCredential = determineLoginCredential(loginRequest);
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginCredential,
                         loginRequest.getPassword()
                 )
         );
 
-        User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user ;
+        Optional<User> userOptional = userRepository.findByUsername(loginCredential);
+        if(userOptional.isEmpty()) {
+            userOptional = userRepository.findByEmail(loginCredential);
+        }
+        user = userOptional.orElseThrow(() ->
+                new RuntimeException("User not found with provided credentials")
+        );
+
         if(!user.isActive()) {
             throw new RuntimeException("User is blocked");
         }
@@ -123,6 +133,16 @@ public class AuthServiceImpl implements AuthService {
         );
 
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    private String determineLoginCredential(LoginRequest loginRequest) {
+        if (loginRequest.getUsername() != null && !loginRequest.getUsername().isEmpty()) {
+            return loginRequest.getUsername();
+        } else if (loginRequest.getEmail() != null && !loginRequest.getEmail().isEmpty()) {
+            return loginRequest.getEmail();
+        } else {
+            throw new RuntimeException("Username or email is required");
+        }
     }
 
     @Override

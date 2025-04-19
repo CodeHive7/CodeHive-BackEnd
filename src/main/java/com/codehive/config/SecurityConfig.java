@@ -26,10 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -83,9 +80,16 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return username -> {
-            User user = userRepository.findByUsernameWithRolesAndPermissions(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return usernameOrEmail -> {
+            Optional<User> userOptional = userRepository.findByUsernameWithRolesAndPermissions(usernameOrEmail);
+
+            if (userOptional.isEmpty()) {
+                userOptional = userRepository.findByEmailWithRolesAndPermissions(usernameOrEmail);
+            }
+
+            User user = userOptional.orElseThrow(() ->
+                    new UsernameNotFoundException("User not found with username or email:" + usernameOrEmail)
+            );
 
             Set<GrantedAuthority> authorities = new HashSet<>();
 
